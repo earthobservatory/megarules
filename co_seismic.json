@@ -1,0 +1,13 @@
+{ "filtered": { 
+	"query": { 
+		"bool": { 
+			"must": [ 
+				$passthrough 
+				{ "term": { "dataset.raw": $dataset_name } }, 
+				{ "range": {"metadata.sensingStop": { "from": $event_time , "to": $end_time } } } 
+				] 
+			} 
+		}, 
+	"filter": { "geo_shape": { "location": { "shape": $coordinates } } } 
+	} 
+}

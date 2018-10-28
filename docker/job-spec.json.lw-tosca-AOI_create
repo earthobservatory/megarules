@@ -1,0 +1,65 @@
+{
+  "required_queues":["factotum-create_aoi-queue"],
+  "command":"/home/ops/verdi/ops/create_aoi/create_AOI.sh",
+  "disk_usage":"3GB",
+  "params" : [
+    {
+      "name": "project_name",
+      "destination": "context"
+    },
+    {
+      "name": "AOI_name",
+      "destination": "context"
+    },
+    {
+      "name": "AOI_type",
+      "destination": "context"
+    },
+    {
+      "name": "label",
+      "destination": "context"
+    },
+    {
+      "name": "coordinates",
+      "destination": "context"
+    },
+    {
+      "name": "event_type",
+      "destination": "context"
+    },
+    {
+      "name": "event_time",
+      "destination": "context"
+    },
+    {
+      "name": "start_time",
+      "destination": "context"
+    },
+    {
+      "name": "end_time",
+      "destination": "context"
+    },
+    {
+      "name": "img_URL",
+      "destination": "context"
+    },
+    {
+      "name": "use_case",
+      "destination": "context"
+    },
+    {
+      "name": "emails",
+      "destination": "context"
+    },
+    {
+      "name": "username",
+      "destination": "context"
+    },
+    {
+      "name": "name",
+      "destination": "context"
+    }
+  ]
+}
+
+

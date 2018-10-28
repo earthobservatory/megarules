@@ -1,0 +1,115 @@
+{
+  "required_queues":["factotum-create_aoi-queue"],
+  "command":"/home/ops/verdi/ops/create_aoi/create_AOI.sh",
+  "disk_usage":"3GB",
+  "params" : [
+    {
+      "name": "project_name",
+      "destination": "context"
+    },
+    {
+      "name": "AOI_name",
+      "destination": "context"
+    },
+    {
+      "name": "AOI_type",
+      "destination": "context"
+    },
+    {
+      "name": "IFG_processing",
+      "destination": "context"
+    },
+    {
+      "name": "SLCP_processing",
+      "destination": "context"
+    },
+    {
+      "name": "LAR_processing",
+      "destination": "context"
+    },
+    {
+      "name": "COD_processing",
+      "destination": "context"
+    },
+    {
+      "name": "ifg_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "lar_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "cod_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "SLCP_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "LAR_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "IFG_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "COD_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "track_number",
+      "destination": "context"
+    },
+    {
+      "name": "use_case",
+      "destination": "context"
+    },
+    {
+      "name": "temporal_baseline",
+      "destination": "context"
+    },
+    {
+      "name": "query",
+      "destination": "context"
+    },
+    {
+      "name": "minimum_pair",
+      "destination": "context"
+    },
+    {
+      "name": "range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "azimuth_looks",
+      "destination": "context"
+    },
+    {
+      "name": "filter_strength",
+      "destination": "context"
+    },
+    {
+      "name": "dem_type",
+      "destination": "context"
+    },
+    {
+      "name": "coverage_threshold",
+      "destination": "context"
+    },
+    {
+      "name": "dataset_tag",
+      "destination": "context"
+    },
+    {
+      "name": "emails",
+      "destination": "context"
+    }
+  ]
+}

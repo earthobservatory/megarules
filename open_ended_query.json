@@ -1,0 +1,24 @@
+{
+  "filtered": {
+    "query": {
+       "bool": {
+        "must": [
+          { "term": { "dataset.raw": $dataset_type } },
+          $passthrough
+          $track_number
+         { "range": {
+                "starttime": {
+                        "gte": $start_time
+                        } }
+        }
+        ] }
+    },
+    "filter": {
+        "geo_shape":  {
+                "location": {
+                       "shape": $coordinates
+                      }
+                }
+              }
+  }
+}

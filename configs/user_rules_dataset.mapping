@@ -1,0 +1,49 @@
+{
+  "mappings": {
+    ".percolator": {
+      "_id": {
+        "type": "string", 
+        "store": "yes", 
+        "index": "not_analyzed"
+      }, 
+      "_timestamp": {
+        "enabled": true, 
+        "store": "yes"
+      },
+      "properties": {
+        "query": {
+          "enabled": false,
+          "type": "object"
+        },
+        "workflow": {
+          "index": "not_analyzed", 
+          "type": "string"
+        }, 
+        "job_type": {
+          "index": "not_analyzed", 
+          "type": "string"
+        }, 
+        "rule_name": {
+          "index": "not_analyzed", 
+          "type": "string"
+        }, 
+        "username": {
+          "index": "not_analyzed", 
+          "type": "string"
+        }, 
+        "query_string": {
+          "index": "not_analyzed", 
+          "type": "string"
+        },
+        "kwargs": {
+          "index": "not_analyzed", 
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "null_value": true
+        }
+      }
+    }
+  }
+}

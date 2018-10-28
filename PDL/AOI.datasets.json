@@ -1,0 +1,7 @@
+{
+  "version": "v2.0",
+  "label": $label,
+  "location": $coordinates,
+  "starttime": $start_time$end_time
+  "endquery": "event + 21 days"
+}

@@ -1,0 +1,182 @@
+{
+  "label" : "Mega Rules",
+  "submission_type":"individual",
+  "allowed_accounts": [ "ops" ],
+  "component" : "tosca",
+  "params" : [
+    {
+      "name": "project_name",
+      "from": "submitter",
+      "type": "enum",
+      "enumerables": ["grfn", "aria", "urgent-response", "mem", "dwr"]
+    },
+    {
+      "name": "AOI_name",
+      "from": "submitter",
+      "type": "text",
+      "placeholder":"name of Area of Interest"
+    },
+    {
+      "name": "AOI_type",
+      "from": "submitter",
+      "type": "enum",
+      "enumerables": ["pdl_event","urgent_response","monitoring"]
+    },
+    {
+      "name": "IFG_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "SLCP_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "LAR_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "COD_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "ifg_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-sciflo-s1-ifg"
+    },
+    {
+      "name": "slcp_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-sciflo-s1-slcp-mrpe"
+    },
+    {
+      "name": "lar_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-s1-lar"
+    },
+    {
+      "name": "cod_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-slcp2cod_network_selector"
+    },
+    {
+      "name": "SLCP_workflow_version",
+      "from": "value",
+      "type": "text",
+      "value": "release-20180126"
+    },
+    {
+      "name": "LAR_workflow_version",
+      "from": "value",
+      "type": "text",
+      "value": "release-20180126"
+    },
+    {
+      "name": "IFG_workflow_version",
+      "from": "value",
+      "type": "text",
+      "value": "release-20180126"
+    },
+    {
+      "name": "COD_workflow_version",
+      "from": "value",
+      "type": "text",
+      "value": "master"
+    },
+    {
+      "name": "track_number",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "default": "not_specified"
+    },
+    {
+      "name": "use_case",
+      "from": "value",
+      "type": "text",
+      "value": "mega"
+    },
+    {
+      "name": "temporal_baseline",
+      "type": "text",
+      "from": "submitter",
+      "placeholder":"no. of days to look back for product pairs"
+    },
+    {
+      "name": "query",
+      "type": "text",
+      "from": "passthrough"
+    },
+    {
+      "name": "minimum_pair",
+      "from": "submitter",
+      "type": "text",
+      "placeholder":"min no. of pairs guaranteed to be processed"
+    },
+    {
+      "name": "range_looks",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "input for IFG",
+      "optional": true,
+      "default": "7"
+    },
+    {
+      "name": "azimuth_looks",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "input for IFG",
+      "optional": true,
+      "default": "3"
+    },
+    { 
+      "name": "filter_strength",
+      "from": "submitter",
+      "type": "number",
+      "default": "0.5"
+    },
+    {
+      "name": "dem_type",
+      "from": "submitter",
+      "type": "enum",
+      "default": "SRTM+v3",
+      "enumerables": ["SRTM+v3", "NED1", "NED13", "NED13-downsampled"]
+    },
+    {
+      "name": "coverage_threshold",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "coverage required to match pairs",
+      "optional": false,
+      "default": "0.20"
+    },
+    {
+      "name": "dataset_tag",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "user tag for data products",
+      "optional": true
+    },
+    {
+      "name": "emails",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "for email notification"
+    },
+    {
+      "name": "username",
+      "from": "passthrough"
+    },
+    {
+      "name": "name",
+      "from": "passthrough"
+    }
+  ]
+}

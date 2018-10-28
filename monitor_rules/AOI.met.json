@@ -1,0 +1,19 @@
+{
+  "priority":$priority,
+  "query": {
+     "apihub": {
+        "label": "APIHub OpenData",
+        "products": ["S1_IW_SLC"],
+         "starttime": "now - 3 days",
+         "endtime": "now"
+      },
+     "asf": {
+        "label": "ASF",
+        "products": ["S1_IW_SLC"]
+      },
+     "scihub": {
+        "label": "SciHub DHUS",
+        "products": ["S1_IW_SLC"]
+      }
+   }
+}
