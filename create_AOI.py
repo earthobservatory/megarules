@@ -107,13 +107,13 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     params["queue"] = "aria-job_worker-small"
     params["priority"] = "5"
     params["name"] = job_name
-    params["tags"] = ["%s" % dataset_tag]
+    params["tags"] = '["%s"]' % dataset_tag
     params["type"] = 'job-%s:%s' % (job, release)
-    params["params"] = job_params
+    params["params"] = json.dumps(job_params)
     params["enable_dedup"] = False
     print('submitting jobs with params:')
     print(json.dumps(params, sort_keys=True,indent=4, separators=(',', ': ')))
-    r = requests.post(job_submit_url, params=json.dumps(params), verify=False)
+    r = requests.post(job_submit_url, params=params, verify=False)
     if r.status_code != 200:
         r.raise_for_status()
     result = r.json()
@@ -379,7 +379,10 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         print(mode+"rule added")
 
         if workflow.endswith("slcp-mrpe") or workflow.endswith("ifg"):
-	    other_params["auto_bbox"] = "true"
+		# hardcoded components in slcp mrpe job with "from": "value" (see hysds.io.jscon.sciflo-s1-slcp-mrpe)
+		other_params["auto_bbox"] = "true"
+		other_params["preReferencePairDirection"] = "backward"
+		other_params["postReferencePairDirection"] = "forward"
 	    other_params["name"] = name
 	    other_params["username"] = user_name
 	#add on-demand job for S1-SLCs already in the system
