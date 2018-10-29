@@ -111,9 +111,12 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     params["type"] = 'job-%s:%s' % (job, release)
     params["params"] = json.dumps(job_params)
     params["enable_dedup"] = False
+    #wrap with a query layer
+    final_params = {}
+    final_params['query'] = params
     print('submitting jobs with params:')
-    print(json.dumps(params, sort_keys=True,indent=4, separators=(',', ': ')))
-    r = requests.post(job_submit_url, params=params, verify=False)
+    print(json.dumps(final_params, sort_keys=True,indent=4, separators=(',', ': ')))
+    r = requests.post(job_submit_url, params=final_params, verify=False)
     if r.status_code != 200:
         r.raise_for_status()
     result = r.json()
