@@ -383,8 +383,8 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
 		other_params["auto_bbox"] = "true"
 		other_params["preReferencePairDirection"] = "backward"
 		other_params["postReferencePairDirection"] = "forward"
-	    other_params["name"] = name
-	    other_params["username"] = user_name
+		other_params["name"] = name
+		other_params["username"] = user_name
 	#add on-demand job for S1-SLCs already in the system
 	submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
 	
