@@ -120,7 +120,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     if 'result' in result.keys() and 'success' in result.keys():
         if result['success'] == True:
             job_id = result['result']
-            print 'submitted create_aoi:%s job: %s job_id: %s' % (release, job_id)
+            print 'submitted create_aoi:%s job: %s job_id: %s' % (release, job, job_id)
         else:
             print 'job not submitted successfully: %s' % result
             raise Exception('job not submitted successfully: %s' % result)
