@@ -91,7 +91,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
      "emails": "namrata.malarout@jpl.nasa.gov"
     }
     '''
-    job_params["query"] = json.loads(condition)
+    job_params["query"] = {"query": json.loads(condition)}
     job = job_type[job_type.find("hysds-io-")+9:]
     '''params = {
         'queue': 'aria-job_worker-small',
