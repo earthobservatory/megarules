@@ -70,19 +70,19 @@
       "name": "SLCP_workflow_version",
       "from": "value",
       "type": "text",
-      "value": "release-20180126"
+      "value": "release-20180823"
     },
     {
       "name": "LAR_workflow_version",
       "from": "value",
       "type": "text",
-      "value": "release-20180126"
+      "value": "release-20180823"
     },
     {
       "name": "IFG_workflow_version",
       "from": "value",
       "type": "text",
-      "value": "release-20180126"
+      "value": "release-20180823"
     },
     {
       "name": "COD_workflow_version",
