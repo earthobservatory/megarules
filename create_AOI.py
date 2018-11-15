@@ -113,7 +113,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     params["enable_dedup"] = False
     print('submitting jobs with params:')
     print(json.dumps(params, sort_keys=True,indent=4, separators=(',', ': ')))
-    r = requests.post(job_submit_url, params=params, verify=False)
+    r = requests.post(job_submit_url, data=params, verify=False)
     if r.status_code != 200:
         r.raise_for_status()
     result = r.json()
