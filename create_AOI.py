@@ -30,8 +30,9 @@ def email_to_user(emails, project_name, rule_names, rules_info):
        to_recipients = [i.strip() for i in emails.split(',')]
     else:
        to_recipients = ''
-       bcc_recipients = ''
-       subject = "[Rule Added] (%s)" % (project_name)
+
+    bcc_recipients = ''
+    subject = "[Rule Added] (%s)" % (project_name)
 
     body = "Hi,\n"
     body += "New trigger rules have been added using the 'Add trigger rules' action. To see the parameters and conditions for each rule created, please check 'My Rules' in the Aria Search interface.\n"
