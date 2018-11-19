@@ -84,7 +84,7 @@
       "name": "IFG_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
-      "version_regex": "job-s1-sciflo-s1-ifg",
+      "version_regex": "job-sciflo-s1-ifg",
       "placeholder": "ifg job version"
     },
     {
