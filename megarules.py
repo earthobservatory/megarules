@@ -253,13 +253,8 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params["name"] = name
         other_params["username"] = user_name
 
-    if workflow.find("cod"):
-        # hardcoded components for cod job submission for defaults
-        other_params["minmatch"] = 1
-        other_params["min_overlap"] = 0.3
-
-    #add on-demand job for S1-SLCs already in the system
-    submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
+        #add on-demand job for S1-SLCs already in the system
+        submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
 
     return rules_info
 
