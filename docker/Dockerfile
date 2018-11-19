@@ -8,11 +8,11 @@ ARG gid
 
 #Change UID and GID from build
 USER root
-RUN set -ex && \
-  usermod -u ${id} ops && \
-  groupmod -g ${gid} ops && \
-  chown -R ops:ops /home/ops/ /data && \
-  usermod -g ${gid} ops
+# RUN set -ex && \
+ #  usermod -u ${id} ops && \
+ #  groupmod -g ${gid} ops && \
+ #  chown -R ops:ops /home/ops/ /data && \
+ #  usermod -g ${gid} ops
 
 #install redis
 RUN set -ex && \
@@ -26,7 +26,7 @@ RUN set -ex \
 
 # provision create_AOI PGE
 USER ops
-COPY . /home/ops/verdi/ops/create_aoi
+COPY . /home/ops/verdi/ops/megarules
 
 # set entrypoint
 WORKDIR /home/ops

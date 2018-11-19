@@ -50,43 +50,8 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     MOZART_URL = app.conf['MOZART_URL']
     job_submit_url = '%s/mozart/api/v0.1/job/submit' % MOZART_URL
 
-    # '''
-    # name:test_notify_aria_hostname
-    # workflow:hysds-io-lw-tosca-notify-by-email:release-20180130
-    # queue:system-jobs-queue
-    # priority:6
-    # query_string:{
-    #   "bool": {
-    #     "must": [
-    #       {
-    #         "term": {
-    #         "dataset.raw": "S1-IW_SLC"
-    #     }
-    #   },
-    #   {
-    #     "term": {
-    #       "metadata.user_tags.raw": "test_offset"
-    #         }
-    #        }
-    #     ]
-    #   }
-    # }
-    # kwargs:{
-    #  "emails": "namrata.malarout@jpl.nasa.gov"
-    # }
-    # '''
     job_params["query"] = {"query": json.loads(condition)}
     job = job_type[job_type.find("hysds-io-")+9:]
-    # '''params = {
-    #     'queue': 'aria-job_worker-small',
-    #     'priority': '5',
-    #     'name': job_name,
-    #     'tags': ["%s" % dataset_tag],
-    #     'type': 'job-%s:%s' % (job, release),
-    #     'params': job_params,
-    #     'enable_dedup': False
-    #
-    # }'''
     params = {}
     params["queue"] = "aria-job_worker-small"
     params["priority"] = "5"
@@ -342,11 +307,6 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
 
     rule_names = []
     rules_info = ''
-    # TODO: remove these unused names
-    ifg_workflow_name = ifg_workflow+":"+ifg_workflow_version
-    slcp_workflow_name = slcp_workflow+":"+slcp_workflow_version
-    lar_workflow_name = lar_workflow+":"+lar_workflow_version
-    cod_workflow_name = cod_workflow+":"+cod_workflow_version
     #check if event time exists
     if end_time != '':
         if event_time == '':
@@ -505,7 +465,6 @@ if __name__ == "__main__":
     dataset_tag = ctx['dataset_tag']
     track_number = ctx['track_number']
     temporal_baseline = ctx['temporal_baseline']
-    condition_query = ctx['query']  # need this to get the faceted on dataset name TODO: remove this?
     minMatch = ctx['minimum_pair']
 
     r = get_AOI(AOI_name)

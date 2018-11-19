@@ -1,6 +1,6 @@
 {
   "required_queues":["factotum-create_aoi-queue"],
-  "command":"/home/ops/verdi/ops/create_aoi/megarules.sh",
+  "command":"/home/ops/verdi/ops/megarules/megarules.sh",
   "disk_usage":"3GB",
   "params" : [
     {
