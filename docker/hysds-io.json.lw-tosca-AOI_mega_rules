@@ -166,7 +166,8 @@
       "name": "emails",
       "from": "submitter",
       "type": "text",
-      "placeholder": "for email notification"
+      "placeholder": "for email notification",
+      "optional":true
     },
     {
       "name": "username",
