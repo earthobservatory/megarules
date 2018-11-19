@@ -68,27 +68,31 @@
     },
     {
       "name": "SLCP_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180126"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-sciflo-s1-slcp-mrpe",
+      "placeholder": "slcp job version"
     },
     {
       "name": "LAR_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180126"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-s1-lar",
+      "placeholder": "lar job version"
     },
     {
       "name": "IFG_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180126"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-sciflo-s1-ifg",
+      "placeholder": "ifg job version"
     },
     {
       "name": "COD_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "master"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-slcp2cod_network_selector",
+      "placeholder": "cod job version"
     },
     {
       "name": "track_number",
@@ -96,12 +100,6 @@
       "type": "text",
       "optional": true,
       "default": "not_specified"
-    },
-    {
-      "name": "use_case",
-      "from": "value",
-      "type": "text",
-      "value": "mega"
     },
     {
       "name": "temporal_baseline",
@@ -168,7 +166,8 @@
       "name": "emails",
       "from": "submitter",
       "type": "text",
-      "placeholder": "for email notification"
+      "placeholder": "for email notification",
+      "optional":true
     },
     {
       "name": "username",
