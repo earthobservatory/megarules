@@ -66,29 +66,33 @@
       "type": "text",
       "value": "hysds-io-slcp2cod_network_selector"
     },
-    {
+        {
       "name": "SLCP_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180823"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-sciflo-s1-slcp-mrpe",
+      "placeholder": "slcp job version"
     },
     {
       "name": "LAR_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180823"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-s1-lar",
+      "placeholder": "lar job version"
     },
     {
       "name": "IFG_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "release-20180823"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-s1-sciflo-s1-ifg",
+      "placeholder": "ifg job version"
     },
     {
       "name": "COD_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": "master"
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-slcp2cod_network_selector",
+      "placeholder": "cod job version"
     },
     {
       "name": "track_number",
