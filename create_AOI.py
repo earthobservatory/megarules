@@ -147,7 +147,7 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
         file_rule = open(os.path.join(BASE_PATH, 'ifg_query.json'))
         rule_query_temp = Template( file_rule.read())
         rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
-        else:
+    else:
         file_rule = open(os.path.join(BASE_PATH, 'open_ended_query.json'))
         rule_query_temp = Template( file_rule.read())
         rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"', 'coordinates':json.dumps(coordinates)})

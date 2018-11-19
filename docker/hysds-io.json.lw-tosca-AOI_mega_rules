@@ -98,12 +98,6 @@
       "default": "not_specified"
     },
     {
-      "name": "use_case",
-      "from": "value",
-      "type": "text",
-      "value": "mega"
-    },
-    {
       "name": "temporal_baseline",
       "type": "text",
       "from": "submitter",

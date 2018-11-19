@@ -68,10 +68,6 @@
       "destination": "context"
     },
     {
-      "name": "use_case",
-      "destination": "context"
-    },
-    {
       "name": "temporal_baseline",
       "destination": "context"
     },
