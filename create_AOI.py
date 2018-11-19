@@ -217,7 +217,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params = {"event_time":event_time, "start_time":start_time, "end_time":end_time, "dataset_tag":dataset_tag, "project":projectName, "singlesceneOnly": "true", "temporalBaseline":temporal_baseline, "minMatch":minMatch, "covth":coverage_threshold, "precise_orbit_only":"false", "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks}
     elif workflow.find("cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "minmatch": minMatch, "aoi_name":AOI_name}
+        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "aoi_name":AOI_name}
 
     logger.debug("Going to add "+mode+"rule for "+workflow)
     logger.debug("Rule names: %s"% rule_name)
@@ -251,6 +251,11 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params["postReferencePairDirection"] = "forward"
         other_params["name"] = name
         other_params["username"] = user_name
+
+    if workflow.find("cod"):
+        # hardcoded components for cod job submission for defaults
+        other_params["minmatch"] = 1
+        other_params["min_overlap"] = 0.3
 
     #add on-demand job for S1-SLCs already in the system
     submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
@@ -391,7 +396,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend([AOI_name+"-lar_email"])
             if cod_rule == True:
                 # add event rule
-                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, '', '', '', '', '', dataset_tag, 7)
+                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, 7)
                 rule_names.extend(['event-cod_'+AOI_name])
                 #add mail rule
                 rules_info += add_email_rule(AOI_name, "S1-COD", track_number, passthrough, event_time, coordinates, emails)
@@ -444,7 +449,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend([AOI_name+"-lar_email"])
 
             if cod_rule == True:
-                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, '', '', '', '', '', dataset_tag, 7)
+                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, 7)
 
                 rule_names.extend(["event-cod_"+AOI_name])
                 #add email rule
