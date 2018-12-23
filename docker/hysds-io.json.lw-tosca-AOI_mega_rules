@@ -8,7 +8,7 @@
       "name": "project_name",
       "from": "submitter",
       "type": "enum",
-      "enumerables": ["aria", "change_detection", ""urgent_response", "volcano", "sealevel", "tectonics"]
+      "enumerables": ["aria", "change_detection", "urgent_response", "volcano", "sealevel", "tectonics"]
     },
     {
       "name": "AOI_name",
