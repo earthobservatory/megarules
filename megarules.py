@@ -466,6 +466,7 @@ if __name__ == "__main__":
     track_number = ctx['track_number']
     temporal_baseline = ctx['temporal_baseline']
     minMatch = ctx['minimum_pair']
+    slcp_product_version = ctx['slcp_product_version']
 
     r = get_AOI(AOI_name)
     if r.status_code != 200:
