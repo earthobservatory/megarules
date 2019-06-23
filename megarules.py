@@ -54,7 +54,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     job = job_type[job_type.find("hysds-io-")+9:]
     params = {}
     params["queue"] = job_params["project"]+"-job_worker-small"
-    params["priority"] = "5"
+    params["priority"] = "9"
     params["name"] = job_name
     params["tags"] = '["%s"]' % dataset_tag
     params["type"] = 'job-%s:%s' % (job, release)
@@ -227,7 +227,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow_params, projectNa
 
     return rules_info
 
-def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, priority):
+def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, dataset_tag, priority):
     #mode can be pre-event-, post-event- or ''(in the case of monitoring)
     workflow = workflow_params['workflow']
     workflow_version = workflow_params['workflow_version']
@@ -266,6 +266,7 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, priorit
     logger.debug(mode+"rule added")
     print(mode+"rule added")
 
+    submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
     return rules_info
 
 
@@ -352,7 +353,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend([AOI_name+"-slcp_email"])
             if lar_rule == True:
                 event_rule = co_event_rule(passthrough, "S1-SLCP", track_number, event_time, coordinates)
-                rules_info += add_co_event_lar(event_rule, projectName, AOI_name, lar_params, 7)
+                rules_info += add_co_event_lar(event_rule, projectName, AOI_name, lar_params, dataset_tag, 7)
                 rule_names.extend(["co-event-lar_"+AOI_name])
                 #add email rule
                 rules_info += add_email_rule(AOI_name, "S1-LAR", track_number, passthrough, event_time, coordinates, emails)
@@ -406,7 +407,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
 
             if lar_rule == True:
                 event_rule = co_event_rule(passthrough, "S1-SLCP", track_number, event_time, coordinates)
-                rules_info += add_co_event_lar(event_rule, projectName, AOI_name, lar_params, 7)
+                rules_info += add_co_event_lar(event_rule, projectName, AOI_name, lar_params, dataset_tag, 7)
                 rule_names.extend(["co-event-lar_"+AOI_name])
                 #add email rule
                 rules_info += add_email_rule(AOI_name, "S1-LAR", track_number, passthrough, event_time, coordinates, emails)
