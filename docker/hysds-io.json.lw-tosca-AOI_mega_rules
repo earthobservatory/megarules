@@ -191,7 +191,7 @@
       "type": "number",
       "placeholder": "coverage required to match pairs",
       "optional": false,
-      "default": "0.20"
+      "default": "0.30"
     },
     {
       "name": "dataset_tag",

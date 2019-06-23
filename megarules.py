@@ -187,7 +187,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow_params, projectNa
         other_params = {"event_time":event_time, "start_time":start_time, "end_time":end_time, "dataset_tag":dataset_tag, "project":projectName, "singlesceneOnly": "true", "temporalBaseline":temporal_baseline, "minMatch":minMatch, "covth":coverage_threshold, "precise_orbit_only":"false", "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks}
     elif workflow.find("cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "aoi_name":AOI_name, "overriding_azimuth_looks":azimuth_looks, "overriding_range_looks":range_looks, "track_number": track_number}
+        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "aoi_name":AOI_name, "overriding_azimuth_looks":azimuth_looks, "overriding_range_looks":range_looks, "track_number": track_number, "minmatch":minMatch,  "min_overlap":coverage_threshold}
 
     logger.debug("Going to add "+mode+"rule for "+workflow)
     logger.debug("Rule names: %s"% rule_name)
