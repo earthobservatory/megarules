@@ -475,8 +475,8 @@ if __name__ == "__main__":
 
     slcp_params['workflow']= ctx['slcp_workflow']
     slcp_params['workflow_version'] = ctx['SLCP_workflow_version']
-    slcp_params['azimuth_looks'] = 0
-    slcp_params['range_looks'] = 0
+    slcp_params['azimuth_looks'] = 3 # use default values as it should not matter
+    slcp_params['range_looks'] = 7 # use default values as it should not matter
 
     lar_params['workflow'] = ctx['lar_workflow']
     lar_params['workflow_version'] = ctx['LAR_workflow_version']
