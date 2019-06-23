@@ -182,32 +182,6 @@ def submit_iterator_job(projectName, rule_name, workflow, priority, query_string
 
     # ensure GRQ product index mappings exist in percolator index
     add_grq_mappings(es_url, es_index)
-
-    # # query
-    # query = {
-    #     "query": {
-    #         "bool": {
-    #             "must": [
-    #                 { "term": { "username": user_name }  },
-    #                 { "term": { "rule_name": rule_name } },
-    #             ]
-    #         }
-    #     }
-    # }
-    # r = requests.post('%s/%s/.percolator/_search' % (es_url, es_index), data=json.dumps(query))
-    # result = r.json()
-    # if r.status_code != 200:
-    #     logger.debug("Failed to query ES. Got status code %d:\n%s" %
-    #                      (r.status_code, json.dumps(result, indent=2)))
-    # r.raise_for_status()
-    # if result['hits']['total'] == 1:
-    #     logger.debug("Found a rule using that name already: %s" % rule_name)
-    #     return json.dumps({
-    #         'success': False,
-    #         'message': "Found a rule using that name already: %s" % rule_name,
-    #         'result': None,
-    #     }), 500
-
     job_type = None
     passthru_query = False
     query_all = False
