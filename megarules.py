@@ -178,7 +178,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow_params, projectNa
 
     if workflow.endswith("lar"):
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"lar_azimuth_looks":azimuth_looks, "lar_range_looks":range_looks}
+        other_params = {"lar_azimuth_looks":azimuth_looks, "lar_range_looks":range_looks, "project":projectName}
     elif workflow.endswith("ifg"):
         event_rule = rule_generation(open_ended, '"S1-IW_SLC"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"dataset_tag":dataset_tag,"project":projectName , "singlesceneOnly": "true", "preReferencePairDirection": "backward", "postReferencePairDirection": "forward", "temporalBaseline":temporal_baseline,"minMatch":minMatch, "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks, "covth":coverage_threshold, "precise_orbit_only":"false"}
@@ -232,7 +232,8 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, dataset
     workflow = workflow_params['workflow']
     workflow_version = workflow_params['workflow_version']
     other_params = {"lar_azimuth_looks": workflow_params['azimuth_looks'],
-                    "lar_range_looks": workflow_params['range_looks']}
+                    "lar_range_looks": workflow_params['range_looks'],
+                    "project": projectName}
 
     mode = "co-event-"
     workflow_name = workflow+":"+workflow_version
