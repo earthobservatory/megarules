@@ -100,7 +100,7 @@
       "name": "slcp_product_version",
       "from": "submitter",
       "type": "text",
-      "default": "v1.3"
+      "default": "v1.2"
     },
     {
       "name": "LAR_workflow_version",
