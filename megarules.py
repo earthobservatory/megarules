@@ -15,7 +15,7 @@ logger = logging.getLogger("hysds")
 
 #manually update this block when there is unsync with avaliable version of email and slcp product version
 notify_by_email_io = "hysds-io-lw-tosca-notify-by-email"
-email_job_version = "release-20170510"
+email_job_version = "v0.0.3"
 admin_email = "grfn-ops@jpl.nasa.gov"
 slcp_product_version = None #look at ariamh/conf/dataset_versions.json under the correct release version
 user_name = None
@@ -273,7 +273,7 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, dataset
     logger.debug(mode+"rule added")
     print(mode+"rule added")
 
-    add_user_rules.submit_iterator_job("tosca", event_rule)
+    add_user_rules.submit_iterator_job(projectName, rule_name, workflow_name, priority, event_rule, other_params)
     # submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
     return rules_info
 
