@@ -92,14 +92,6 @@
       "destination": "context"
     },
     {
-      "name": "slcp_range_looks",
-      "destination": "context"
-    },
-    {
-      "name": "slcp_azimuth_looks",
-      "destination": "context"
-    },
-    {
       "name": "lar_range_looks",
       "destination": "context"
     },
