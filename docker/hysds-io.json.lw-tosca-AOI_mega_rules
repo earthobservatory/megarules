@@ -140,7 +140,7 @@
       "default": "16,16,16"
     },
     {
-      "name": "cod_azimuth_looks ",
+      "name": "cor_azimuth_looks ",
       "from": "submitter",
       "type": "text",
       "placeholder": "input for COD (comma sep s1,s2,s3)",
