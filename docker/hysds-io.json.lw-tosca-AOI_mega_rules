@@ -137,7 +137,6 @@
       "from": "submitter",
       "type": "text",
       "placeholder": "input for COD (comma sep. s1,s2,s3)",
-      "optional": true,
       "default": "16,16,16"
     },
     {
@@ -145,7 +144,6 @@
       "from": "submitter",
       "type": "text",
       "placeholder": "input for COD (comma sep s1,s2,s3)",
-      "optional": true,
       "default": "4,4,4"
     },
     {
