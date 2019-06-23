@@ -210,7 +210,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow_params, projectNa
     #rules_info += "event_rule: %s"% event_rule+"\n"
     #rules_info += "other params: %s"% other_params+'\n'
 
-    add_user_rules.add_user_rule(projectName, rule_name, workflow, priority, event_rule, other_params)
+    add_user_rules.add_user_rule(projectName, rule_name, workflow_name, priority, event_rule, other_params)
     logger.debug(mode+"rule added")
     print(mode+"rule added")
 
