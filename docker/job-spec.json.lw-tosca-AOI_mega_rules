@@ -84,11 +84,35 @@
       "destination": "context"
     },
     {
-      "name": "range_looks",
+      "name": "ifg_range_looks",
       "destination": "context"
     },
     {
-      "name": "azimuth_looks",
+      "name": "ifg_azimuth_looks",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_azimuth_looks",
+      "destination": "context"
+    },
+    {
+      "name": "lar_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "lar_azimuth_looks",
+      "destination": "context"
+    },
+    {
+      "name": "cod_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "cod_azimuth_looks",
       "destination": "context"
     },
     { 
