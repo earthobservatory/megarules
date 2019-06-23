@@ -45,6 +45,12 @@ def email_to_user(emails, project_name, rule_names, rules_info):
     logger.info("Email sent to %s",emails)
     print ("Email sent to %s",emails)
 
+def submit_iterate_job(job_name, job_type, release, job_params, condition, dataset_tag):
+    job_params["query"] = {"query": json.loads(condition)}
+    job_params[""]
+
+
+
 def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag):
     # submit mozart job
     MOZART_URL = app.conf['MOZART_URL']
@@ -267,7 +273,8 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, dataset
     logger.debug(mode+"rule added")
     print(mode+"rule added")
 
-    submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
+    add_user_rules.submit_iterator_job("tosca", event_rule)
+    # submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
     return rules_info
 
 
