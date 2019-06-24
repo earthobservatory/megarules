@@ -282,45 +282,47 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow_params, dataset
 
 
 def add_email_rule(AOI_name, dataset, track_number, passthrough, event_time, coordinates, emails):
+    if emails:
+        if dataset == "S1-SLCP":
+            product_type = "slcp"
+        elif dataset == "S1-IFG":
+            product_type = "ifg"
+        elif dataset == "S1-LAR":
+            product_type = "lar"
+        elif dataset == "S1-COD":
+            product_type = "cod"
 
-    if dataset == "S1-SLCP":
-        product_type = "slcp"
-    elif dataset == "S1-IFG":
-        product_type = "ifg"
-    elif dataset == "S1-LAR":
-        product_type = "lar"
-    elif dataset == "S1-COD":
-        product_type = "cod"
+        email_rule_set = co_event_rule(passthrough, dataset, track_number, event_time, json.dumps(coordinates))
+        other_params = {"emails": emails}
 
-    email_rule_set = co_event_rule(passthrough, dataset, track_number, event_time, json.dumps(coordinates))
-    other_params = {"emails": emails}
+        logger.debug("Going to add email notification rule for co-seismic products")
+        logger.debug("Rule name: %s", AOI_name+"-"+product_type+"_email")
+        logger.debug("workflow: %s", notify_by_email_io+":"+email_job_version)
+        logger.debug("priority: %s", '0')
+        logger.debug("email_rule_set: %s",email_rule_set)
+        logger.debug("other params: %s", other_params)
+        logger.debug("Event notification rule added")
 
-    logger.debug("Going to add email notification rule for co-seismic products")
-    logger.debug("Rule name: %s", AOI_name+"-"+product_type+"_email")
-    logger.debug("workflow: %s", notify_by_email_io+":"+email_job_version)
-    logger.debug("priority: %s", '0')
-    logger.debug("email_rule_set: %s",email_rule_set)
-    logger.debug("other params: %s", other_params)
-    logger.debug("Event notification rule added")
+        rules_info = "Added email notification rule for co-seismic products\n"
+        rules_info += "Rule name: %s"%AOI_name+"-"+product_type+"_email"+'\n'
+        rules_info += "workflow: %s"% notify_by_email_io+":"+email_job_version+'\n'
+        rules_info += "priority: %s"% '0\n'
+        rules_info += "email notification rule: %s"%email_rule_set+"\n"
+        rules_info +="other params: %s"%other_params+'\n'
 
-    rules_info = "Added email notification rule for co-seismic products\n"
-    rules_info += "Rule name: %s"%AOI_name+"-"+product_type+"_email"+'\n'
-    rules_info += "workflow: %s"% notify_by_email_io+":"+email_job_version+'\n'
-    rules_info += "priority: %s"% '0\n'
-    rules_info += "email notification rule: %s"%email_rule_set+"\n"
-    rules_info +="other params: %s"%other_params+'\n'
+        print("Going to add email notification rule for co-seismic products")
+        print("Rule name: %s", AOI_name+"-"+product_type+"_email")
+        print("workflow: %s", notify_by_email_io+":"+email_job_version)
+        print("priority: %s", '0')
+        print("email_rule_set: %s",email_rule_set)
+        print("other params: %s", other_params)
+        add_user_rules.add_user_rule(projectName, AOI_name+"-"+product_type+"_email", notify_by_email_io+":"+email_job_version, 0, email_rule_set, other_params)
+        logger.debug("Event notification rule added")
+        print("Event notification rule added")
 
-    print("Going to add email notification rule for co-seismic products")
-    print("Rule name: %s", AOI_name+"-"+product_type+"_email")
-    print("workflow: %s", notify_by_email_io+":"+email_job_version)
-    print("priority: %s", '0')
-    print("email_rule_set: %s",email_rule_set)
-    print("other params: %s", other_params)
-    add_user_rules.add_user_rule(projectName, AOI_name+"-"+product_type+"_email", notify_by_email_io+":"+email_job_version, 0, email_rule_set, other_params)
-    logger.debug("Event notification rule added")
-    print("Event notification rule added")
-        
-    return rules_info
+        return rules_info
+    else:
+        return "No emails specified, skipping event notification."
 
 def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, slcp_params, lar_params, ifg_params, cod_params, projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, filter_strength, dem_type, coverage_threshold, dataset_tag, emails):
 
