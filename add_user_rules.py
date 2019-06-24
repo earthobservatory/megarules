@@ -3,6 +3,7 @@ from hysds.celery import app
 import hysds_commons.action_utils
 import hysds_commons.mozart_utils
 import hysds_commons.job_rest_utils
+from hysds_commons.job_iterator import iterate
 from datetime import datetime
 
 logging.basicConfig(level=logging.DEBUG)
@@ -42,12 +43,13 @@ def add_grq_mappings(es_url, es_index):
                                  data=json.dumps(mappings[idx]['mappings'][doc_type]))
                 r.raise_for_status()
 
+
 def add_user_rule(projectName, rule_name, workflow, priority, query_string, other_params):
     """Add a user rule."""
     if 'lar' in workflow:
 	queue = projectName+"-job_worker-large"
     elif 'email' in workflow:
-	queue = "system-jobs-queue" 
+	queue = "system-jobs-queue"
     else:
     	queue = projectName+"-job_worker-small"
 
@@ -89,7 +91,7 @@ def add_user_rule(projectName, rule_name, workflow, priority, query_string, othe
     r = requests.post('%s/%s/.percolator/_search' % (es_url, es_index), data=json.dumps(query))
     result = r.json()
     if r.status_code != 200:
-        logger.debug("Failed to query ES. Got status code %d:\n%s" % 
+        logger.debug("Failed to query ES. Got status code %d:\n%s" %
                          (r.status_code, json.dumps(result, indent=2)))
     r.raise_for_status()
     if result['hits']['total'] == 1:
@@ -110,7 +112,7 @@ def add_user_rule(projectName, rule_name, workflow, priority, query_string, othe
             job_type = action['job_type']
             passthru_query = action.get('passthru_query', False)
             query_all = action.get('query_all', False)
-    if job_type is None: 
+    if job_type is None:
 	print "No job_type find for '%s'." % workflow
         logger.debug("No job_type find for '%s'." % workflow)
         return json.dumps({
@@ -119,7 +121,7 @@ def add_user_rule(projectName, rule_name, workflow, priority, query_string, othe
             'result': None,
         }), 500
 
-    time_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')    
+    time_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
     # upsert new document
     new_doc = {
         "workflow": workflow,
@@ -152,3 +154,69 @@ def add_user_rule(projectName, rule_name, workflow, priority, query_string, othe
         'message': "",
         'result': result,
     })
+
+def submit_iterator_job(projectName, rule_name, workflow, priority, query_string, other_params):
+    """Add a user rule."""
+    queue = projectName+"-job_worker-small"
+
+    if workflow is None:
+        return json.dumps({
+            'success': False,
+            'message': "Workflow not specified.",
+            'result': None,
+        }), 500
+
+    with open('_job.json') as f:
+      ctx = json.load(f)
+
+    user_name = ctx['username']
+
+    # get es url and index
+    es_url = app.conf['GRQ_ES_URL']
+    es_index = app.conf['USER_RULES_DATASET_INDEX']
+
+    # if doesn't exist, create index
+    r = requests.get('%s/%s' % (es_url, es_index))
+    if r.status_code == 404:
+        create_user_rules_index(es_url, es_index)
+
+    # ensure GRQ product index mappings exist in percolator index
+    add_grq_mappings(es_url, es_index)
+    job_type = None
+    passthru_query = False
+    query_all = False
+    print 'GRQ_ES_URL (iospec_es_url): %s   JOBS_ES_URL (jobspec_es_url): %s'%(app.conf["GRQ_ES_URL"],app.conf["JOBS_ES_URL"])
+    for action in hysds_commons.action_utils.get_action_spec(app.conf["GRQ_ES_URL"],app.conf["JOBS_ES_URL"]):
+	#print "Action from hysds_commons.action_utils.get_action_spec: %s"%action
+        if action['type'] == workflow:
+            job_type = action['job_type']
+            passthru_query = action.get('passthru_query', False)
+            query_all = action.get('query_all', False)
+    if job_type is None:
+	print "No job_type find for '%s'." % workflow
+        logger.debug("No job_type find for '%s'." % workflow)
+        return json.dumps({
+            'success': False,
+            'message': "No job_type found for '%s'." % workflow,
+            'result': None,
+        }), 500
+
+    time_now = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    # upsert new document
+    new_doc = {
+        "workflow": workflow,
+        "priority": priority,
+        "rule_name": rule_name,
+        "username": user_name,
+        "query_string": query_string,
+        "kwargs": json.dumps(other_params),
+        "job_type": job_type,
+        "enabled": True,
+        "query": json.loads(query_string),
+        "passthru_query": passthru_query,
+        "query_all": query_all,
+        "queue":queue,
+        "creation_time":time_now,
+        "modification_time":time_now
+    }
+    iterate("tosca", new_doc)

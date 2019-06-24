@@ -48,6 +48,18 @@
       "destination": "context"
     },
     {
+      "name": "IFG_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "ifg_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "ifg_azimuth_looks",
+      "destination": "context"
+    },
+    {
       "name": "SLCP_workflow_version",
       "destination": "context"
     },
@@ -60,11 +72,23 @@
       "destination": "context"
     },
     {
-      "name": "IFG_workflow_version",
+      "name": "lar_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "lar_azimuth_looks",
       "destination": "context"
     },
     {
       "name": "COD_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "cod_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "cod_azimuth_looks",
       "destination": "context"
     },
     {
@@ -81,14 +105,6 @@
     },
     {
       "name": "minimum_pair",
-      "destination": "context"
-    },
-    {
-      "name": "range_looks",
-      "destination": "context"
-    },
-    {
-      "name": "azimuth_looks",
       "destination": "context"
     },
     { 

@@ -67,6 +67,29 @@
       "value": "hysds-io-slcp2cod_network_selector"
     },
     {
+      "name": "IFG_workflow_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-sciflo-s1-ifg",
+      "placeholder": "ifg job version"
+    },
+    {
+      "name": "ifg_range_looks",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "input for IFG",
+      "optional": true,
+      "default": "7"
+    },
+    {
+      "name": "ifg_azimuth_looks",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "input for IFG",
+      "optional": true,
+      "default": "3"
+    },
+    {
       "name": "SLCP_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
@@ -87,11 +110,20 @@
       "placeholder": "lar job version"
     },
     {
-      "name": "IFG_workflow_version",
+      "name": "lar_range_looks",
       "from": "submitter",
-      "type": "jobspec_version",
-      "version_regex": "job-sciflo-s1-ifg",
-      "placeholder": "ifg job version"
+      "type": "number",
+      "placeholder": "input for LAR",
+      "optional": true,
+      "default": "7"
+    },
+    {
+      "name": "lar_azimuth_looks",
+      "from": "submitter",
+      "type": "number",
+      "placeholder": "input for LAR, one value across all subswaths",
+      "optional": true,
+      "default": "2"
     },
     {
       "name": "COD_workflow_version",
@@ -99,6 +131,20 @@
       "type": "jobspec_version",
       "version_regex": "job-slcp2cod_network_selector",
       "placeholder": "cod job version"
+    },
+    {
+      "name": "cod_range_looks",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "input for COD (comma sep. s1,s2,s3)",
+      "default": "16,16,16"
+    },
+    {
+      "name": "cod_azimuth_looks",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "input for COD (comma sep s1,s2,s3)",
+      "default": "4,4,4"
     },
     {
       "name": "track_number",
@@ -111,7 +157,8 @@
       "name": "temporal_baseline",
       "type": "text",
       "from": "submitter",
-      "placeholder":"no. of days to look back for product pairs"
+      "placeholder":"no. of days to look back for product pairs",
+      "default": "24"
     },
     {
       "name": "query",
@@ -122,23 +169,8 @@
       "name": "minimum_pair",
       "from": "submitter",
       "type": "text",
-      "placeholder":"min no. of pairs guaranteed to be processed"
-    },
-    {
-      "name": "range_looks",
-      "from": "submitter",
-      "type": "number",
-      "placeholder": "input for IFG",
-      "optional": true,
-      "default": "7"
-    },
-    {
-      "name": "azimuth_looks",
-      "from": "submitter",
-      "type": "number",
-      "placeholder": "input for IFG",
-      "optional": true,
-      "default": "3"
+      "placeholder":"min no. of pairs guaranteed to be processed",
+      "default": "1"
     },
     { 
       "name": "filter_strength",
@@ -159,7 +191,7 @@
       "type": "number",
       "placeholder": "coverage required to match pairs",
       "optional": false,
-      "default": "0.20"
+      "default": "0.30"
     },
     {
       "name": "dataset_tag",
