@@ -2,6 +2,8 @@
   "required_queues":["factotum-create_aoi-queue"],
   "command":"/home/ops/verdi/ops/megarules/megarules.sh",
   "disk_usage":"3GB",
+  "soft_time_limit": 480,
+  "time_limit": 960,
   "params" : [
     {
       "name": "project_name",
