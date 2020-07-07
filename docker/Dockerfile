@@ -1,4 +1,4 @@
-FROM hysds/pge-base
+FROM hysds/pge-base:develop-es1
 
 MAINTAINER malarout "Namrata.Malarout@jpl.nasa.gov"
 LABEL description="Job to automate AOI creation and trigger rules"
