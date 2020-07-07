@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-import os, sys, getpass, requests, json, types, base64
+import os
+import sys
+import getpass
+import requests
+import json
+import types
+import base64
 from smtplib import SMTP
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
@@ -9,6 +15,7 @@ from email.Utils import parseaddr, formataddr, COMMASPACE, formatdate
 from email import Encoders
 from hysds.celery import app
 from hysds_commons.net_utils import get_container_host_ip
+
 
 def send_email(sender, cc_recipients, bcc_recipients, subject, body, attachments=None):
     """Send an email.
@@ -24,7 +31,7 @@ def send_email(sender, cc_recipients, bcc_recipients, subject, body, attachments
     The charset of the email will be the first one out of US-ASCII, ISO-8859-1
     and UTF-8 that can represent all the characters occurring in the email.
     """
-    
+
     # combined recipients
     recipients = []
     recipients.extend([cc_recipients, bcc_recipients])
@@ -77,22 +84,23 @@ def send_email(sender, cc_recipients, bcc_recipients, subject, body, attachments
                                   for recipient_name, recipient_addr in unicode_parsed_bcc_recipients])
     msg['Subject'] = Header(unicode(subject), header_charset)
     msg.attach(MIMEText(body.encode(body_charset), 'plain', body_charset))
-    
+
     # Add attachments
     if isinstance(attachments, types.DictType):
         for fname in attachments:
             part = MIMEBase('application', "octet-stream")
             part.set_payload(attachments[fname])
             Encoders.encode_base64(part)
-            part.add_header('Content-Disposition', 'attachment; filename="%s"' % fname)
+            part.add_header('Content-Disposition',
+                            'attachment; filename="%s"' % fname)
             msg.attach(part)
 
-    #print "#" * 80
-    #print msg.as_string()
-    
+    # print "#" * 80
+    # print msg.as_string()
+
     # Send the message via SMTP to docker host
     smtp_url = "smtp://%s:25" % get_container_host_ip()
-    print "smtp_url : %s",smtp_url
+    print("smtp_url : %s", smtp_url)
     smtp = SMTP(get_container_host_ip())
     smtp.sendmail(sender, recipients, msg.as_string())
     smtp.quit()
@@ -113,20 +121,25 @@ def get_source(es_url, query_idx, objectid):
             }
         }
     }
-    print 'get_source debug:', '%s/%s/_search',es_url,"    ", query_idx,'    ',json.dumps(query)
-    r = requests.post('%s/%s/_search' % (es_url, query_idx), data=json.dumps(query))
+    print('get_source debug:', '%s/%s/_search', es_url,
+          "    ", query_idx, '    ', json.dumps(query))
+    r = requests.post('%s/%s/_search' %
+                      (es_url, query_idx), data=json.dumps(query))
     r.raise_for_status()
     result = r.json()
-    if result['hits']['total'] == 0: return None
-    else: return result['hits']['hits'][0]['_source']
+    if result['hits']['total'] == 0:
+        return None
+    else:
+        return result['hits']['hits'][0]['_source']
 
 
 def get_cities(src):
     """Return list of cities."""
 
     cities = []
-    for city in src.get('city',[]):
-        cities.append("%s, %s" % (city.get('name', ''), city.get('admin1_name', '')))
+    for city in src.get('city', []):
+        cities.append("%s, %s" %
+                      (city.get('name', ''), city.get('admin1_name', '')))
     return cities
 
 
@@ -134,10 +147,14 @@ def get_value(d, key):
     """Return value from source based on key."""
 
     for k in key.split('.'):
-        if k in d: d = d[k]
-        else: return None
-    if isinstance(d, types.ListType): return ', '.join([str(i) for i in d])
-    else: return d
+        if k in d:
+            d = d[k]
+        else:
+            return None
+    if isinstance(d, types.ListType):
+        return ', '.join([str(i) for i in d])
+    else:
+        return d
 
 
 def get_metadata_snippet(src, snippet_cfg):
@@ -146,9 +163,11 @@ def get_metadata_snippet(src, snippet_cfg):
     body = ""
     for k, label in snippet_cfg:
         val = get_value(src, k)
-        if val is not None: body += "%s: %s\n" % (label, val)
+        if val is not None:
+            body += "%s: %s\n" % (label, val)
     body += "location type: %s\n" % src.get('location', {}).get('type', None)
-    body += "location coordinates: %s\n" % src.get('location', {}).get('coordinates', [])
+    body += "location coordinates: %s\n" % src.get(
+        'location', {}).get('coordinates', [])
     cities = get_cities(src)
     body += "Closest cities: %s" % "\n                ".join(cities)
     return body
@@ -158,34 +177,36 @@ def get_facetview_link(facetview_url, objectid, system_version=None):
     """Return link to objectid in FacetView interface."""
 
     if system_version is None:
-        b64 = base64.urlsafe_b64encode('{"query":{"query_string":{"query":"id:%s"}}}' % objectid)
+        b64 = base64.urlsafe_b64encode(
+            '{"query":{"query_string":{"query":"id:%s"}}}' % objectid)
     else:
-        b64 = base64.urlsafe_b64encode('{"query":{"query_string":{"query":"id:%s AND system_version:%s"}}}' % (objectid, system_version))
+        b64 = base64.urlsafe_b64encode(
+            '{"query":{"query_string":{"query":"id:%s AND system_version:%s"}}}' % (objectid, system_version))
     return '%s/?base64=%s' % (facetview_url, b64)
-    
+
 
 if __name__ == "__main__":
     settings_file = os.path.normpath(
-                        os.path.join(
-                            os.path.dirname(os.path.realpath(__file__)),
-                        'settings.json')
-                    )
+        os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'settings.json')
+    )
     settings = json.load(open(settings_file))
-   
+
     objectid = sys.argv[1]
     url = sys.argv[2]
     emails = sys.argv[3]
     rule_name = sys.argv[4]
     component = sys.argv[5]
 
-    if component=="mozart" or component=="figaro":
-	es_url = app.conf["JOBS_ES_URL"]
-	query_idx = app.conf["STATUS_ALIAS"]
-	facetview_url = app.conf["MOZART_URL"]
-    elif component=="tosca":
-	es_url = app.conf["GRQ_ES_URL"]
-	query_idx = app.conf["DATASET_ALIAS"]
-	facetview_url = app.conf["GRQ_URL"]
+    if component == "mozart" or component == "figaro":
+        es_url = app.conf["JOBS_ES_URL"]
+        query_idx = app.conf["STATUS_ALIAS"]
+        facetview_url = app.conf["MOZART_URL"]
+    elif component == "tosca":
+        es_url = app.conf["GRQ_ES_URL"]
+        query_idx = app.conf["DATASET_ALIAS"]
+        facetview_url = app.conf["GRQ_URL"]
 
     cc_recipients = [i.strip() for i in emails.split(',')]
     bcc_recipients = []
@@ -197,7 +218,7 @@ if __name__ == "__main__":
         # attach metadata json
         body += "\n\n%s" % get_metadata_snippet(src, settings['SNIPPET_CFG'])
         body += "\n\nThe entire metadata json for this product has been attached for your convenience.\n\n"
-        attachments = { 'metadata.json': json.dumps(src, indent=2) }
+        attachments = {'metadata.json': json.dumps(src, indent=2)}
 
         # attach browse images
         if len(src['browse_urls']) > 0:
@@ -208,13 +229,17 @@ if __name__ == "__main__":
                     small_img = i['small_img']
                     small_img_url = os.path.join(browse_url, small_img)
                     r = requests.get(small_img_url)
-                    if r.status_code != 200: continue
+                    if r.status_code != 200:
+                        continue
                     attachments[small_img] = r.content
-    else: body += "\n\n"
+    else:
+        body += "\n\n"
     body += "You may access the product here:\n\n%s" % url
-    facet_url = get_facetview_link(facetview_url, objectid, None if src is None else src.get('system_version', None))
+    facet_url = get_facetview_link(
+        facetview_url, objectid, None if src is None else src.get('system_version', None))
     if facet_url is not None:
         body += "\n\nYou may view this product in FacetView here:\n\n%s" % facet_url
         body += "\n\nNOTE: You may have to cut and paste the FacetView link into your "
         body += "browser's address bar to prevent your email client from escaping the curly brackets."
-    send_email(getpass.getuser(), cc_recipients, bcc_recipients, subject, body, attachments=attachments)
+    send_email(getpass.getuser(), cc_recipients, bcc_recipients,
+               subject, body, attachments=attachments)

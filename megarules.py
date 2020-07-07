@@ -69,9 +69,9 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     if 'result' in result.keys() and 'success' in result.keys():
         if result['success'] == True:
             job_id = result['result']
-            print 'submitted create_aoi:%s job: %s job_id: %s' % (release, job, job_id)
+            print('submitted create_aoi:%s job: %s job_id: %s' % (release, job, job_id))
         else:
-            print 'job not submitted successfully: %s' % result
+            print('job not submitted successfully: %s' % result)
             raise Exception('job not submitted successfully: %s' % result)
     else:
         raise Exception('job not submitted successfully: %s' % result)
@@ -118,7 +118,7 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
         rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"', 'coordinates':json.dumps(coordinates)})
 
     logger.debug("Rule generation query:\n %s"%rule_query)
-    print "Rule generation query:\n %s"%rule_query
+    print("Rule generation query:\n %s"%rule_query)
     return rule_query
 
 def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinates):
@@ -150,8 +150,8 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
     coordinates = coordinates.replace("'","\"")
 
     co_seismic_query = rule_temp.substitute({'passthrough':pass_str, 'track_number':track_condition, 'dataset_type':'"'+dataset_type+'"' ,'event_time1':'"'+event_time+'"', 'event_time2':'"'+event_time+'"', 'coordinates':coordinates})
-    print "co_seismic_query:\n"
-    print co_seismic_query
+    print("co_seismic_query:\n")
+    print(co_seismic_query)
     return co_seismic_query
 
 def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, priority):
@@ -323,7 +323,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend(['lar_'+AOI_name])
             if cod_rule == True:
                 # if it's a not event the don't add cod rule
-                print "COD rules are only added for events. So ignoreing COD_processing set to true flag."
+                print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
                 #rules_info += add_rule('', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', 4)
         else:
             # add pre-event, post-event and co-event trigger rules
@@ -373,7 +373,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend(['lar_'+AOI_name])
             if cod_rule:
                 #not adding COD because this is not an event
-                print "COD rules are only added for events. So ignoreing COD_processing set to true flag."
+                print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
                 #rule_names.extend(['cod_'+AOI_name])
         else:
             #start time and event time given
