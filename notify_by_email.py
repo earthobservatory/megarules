@@ -12,7 +12,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.header import Header
 from email.utils import parseaddr, formataddr, COMMASPACE, formatdate
-from email import Encoders
+from email import encoders
 from hysds.celery import app
 from hysds_commons.net_utils import get_container_host_ip
 
