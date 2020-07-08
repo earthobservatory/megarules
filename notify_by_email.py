@@ -7,11 +7,11 @@ import json
 import types
 import base64
 from smtplib import SMTP
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
-from email.MIMEBase import MIMEBase
-from email.Header import Header
-from email.Utils import parseaddr, formataddr, COMMASPACE, formatdate
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.header import Header
+from email.utils import parseaddr, formataddr, COMMASPACE, formatdate
 from email import Encoders
 from hysds.celery import app
 from hysds_commons.net_utils import get_container_host_ip
