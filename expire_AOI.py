@@ -41,7 +41,7 @@ def email_to_ops(aoi_list, expired_aois):
     notify_by_email.send_email("noreply-hysds@jpl.nasa.gov",
                                cc_recipients, bcc_recipients, subject, body, attachments)
     LOGGER.info("Email sent to %s", cc_recipients)
-    print("Email sent to %s", cc_recipients)
+    print("Email sent to {}".format(cc_recipients))
 
 
 def get_url_index_type_id(_id):
@@ -181,7 +181,7 @@ def mark_aois_inactive():
     for result in results:
         aoi_id = result["_id"]
         end_time = result["_source"]["endtime"]
-        print(aoi_id + ", endtime :- " + end_time)
+        print("{}, endtime :- {}".format(aoi_id, end_time))
         inactive_aois.append(aoi_id + ", endtime :- " + end_time)
         update_document(aoi_id)
     return inactive_aois
@@ -194,7 +194,7 @@ def send_email_to_ops(inactive_aois):
     for result in results:
         aoi_id = result["_id"]
         end_time = result["_source"]["endtime"]
-        print(aoi_id + ", endtime :- " + end_time)
+        print("{}, endtime :- {}".format(aoi_id, end_time))
         expiring_aois.append(aoi_id + ", endtime :- " + end_time)
     # send email(body)
     email_to_ops(expiring_aois, inactive_aois)

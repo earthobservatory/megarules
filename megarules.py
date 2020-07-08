@@ -43,7 +43,7 @@ def email_to_user(emails, project_name, rule_names, rules_info):
     body += "Thanks,\n Aria"
     notify_by_email.send_email("noreply-hysds@jpl.nasa.gov", to_recipients, bcc_recipients, subject, body, attachments=attachments)
     logger.info("Email sent to %s",emails)
-    print ("Email sent to %s",emails)
+    print ("Email sent to {}".format(emails))
 
 def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag):
     # submit mozart job
@@ -69,12 +69,12 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     if 'result' in result.keys() and 'success' in result.keys():
         if result['success'] == True:
             job_id = result['result']
-            print('submitted create_aoi:%s job: %s job_id: %s' % (release, job, job_id))
+            print('submitted create_aoi:{} job: {} job_id: {}'.format(release, job, job_id))
         else:
-            print('job not submitted successfully: %s' % result)
-            raise Exception('job not submitted successfully: %s' % result)
+            print('job not submitted successfully: {}'.format(result))
+            raise Exception('job not submitted successfully: {}'.format(result))
     else:
-        raise Exception('job not submitted successfully: %s' % result)
+        raise Exception('job not submitted successfully: {}'.format(result))
 
 def get_AOI(AOI_name):
     logger.debug("Going to query ES for AOI")
@@ -117,8 +117,8 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
         rule_query_temp = Template( file_rule.read())
         rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"', 'coordinates':json.dumps(coordinates)})
 
-    logger.debug("Rule generation query:\n %s"%rule_query)
-    print("Rule generation query:\n %s"%rule_query)
+    logger.debug("Rule generation query:\n {}".format(rule_query))
+    print("Rule generation query:\n {}".format(rule_query))
     return rule_query
 
 def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinates):
@@ -169,8 +169,8 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
     elif workflow.find("cod") != -1:
         rule_name = mode+'cod_'+AOI_name
 
-    logger.debug("Kicking off rules for response: %s"%rule_name)
-    print("Kicking off rules for response: %s"%rule_name)
+    logger.debug("Kicking off rules for response: {}".format(rule_name))
+    print("Kicking off rules for response: {}".format(rule_name))
 
     if workflow.endswith("lar"):
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
@@ -185,30 +185,30 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "aoi_name":AOI_name}
 
-    logger.debug("Going to add "+mode+"rule for "+workflow)
-    logger.debug("Rule names: %s"% rule_name)
-    logger.debug("workflows: %s"% workflow_name)
-    logger.debug("priority: %s"% str(priority))
-    logger.debug("rule: %s"% event_rule)
-    logger.debug("other params: %s"% other_params)
+    logger.debug("Going to add {} rule for {}".format(mode,workflow))
+    logger.debug("Rule names: {}".format(rule_name))
+    logger.debug("workflows: {}".format(workflow_name))
+    logger.debug("priority: {}".format(str(priority)))
+    logger.debug("rule: {}".format(event_rule))
+    logger.debug("other params: {}".format(other_params))
 
-    print("Going to add %s rule for %s"% (mode,workflow))
-    print("Rule names: %s"% rule_name)
-    print("workflows: %s"% workflow_name)
-    print("priority: %s"% str(priority))
-    print("rule: %s"% event_rule)
-    print("other params: %s"% other_params)
+    print("Going to add {} rule for {}".format(mode,workflow))
+    print("Rule names: {}".format(rule_name))
+    print("workflows: {}".format(workflow_name))
+    print("priority: {}".format(str(priority)))
+    print("rule: {}".format(event_rule))
+    print("other params: {}".format(other_params))
 
-    rules_info = "Added "+mode+"rule \n"
-    rules_info += "Rule name: %s"% rule_name+'\n'
-    rules_info += "workflow: %s"% workflow_name+'\n'
-    rules_info += "priority: %s"% str(priority)+'\n'
+    rules_info = "Added {} rule \n".format(mode)
+    rules_info += "Rule name: {}\n".format(rule_name)
+    rules_info += "workflow: {}\n".format(workflow_name)
+    rules_info += "priority: {}\n".format(str(priority))
     #rules_info += "event_rule: %s"% event_rule+"\n"
     #rules_info += "other params: %s"% other_params+'\n'
 
     add_user_rules.add_user_rule(projectName, rule_name, workflow_name, priority, event_rule, other_params)
-    logger.debug(mode+"rule added")
-    print(mode+"rule added")
+    logger.debug("{} rule added".format(mode))
+    print("{} rule added".format(mode))
 
     if workflow.endswith("slcp-mrpe") or workflow.endswith("ifg"):
         # hardcoded components in slcp mrpe job with "from": "value" (see hysds.io.json.sciflo-s1-slcp-mrpe)
@@ -231,33 +231,33 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow, workflow_versi
     workflow_name = workflow+":"+workflow_version
     rule_name = mode+'lar_'+AOI_name
 
-    logger.debug("Kicking off rules for response: %s"%rule_name)
-    print("Kicking off rules for response: %s"%rule_name)
+    logger.debug("Kicking off rules for response: {}".format(rule_name))
+    print("Kicking off rules for response: {}".format(rule_name))
 
-    logger.debug("Going to add "+mode+"rule for "+workflow)
-    logger.debug("Rule names: %s"% rule_name)
-    logger.debug("workflows: %s"% workflow_name)
-    logger.debug("priority: %s"% str(priority))
-    logger.debug("rule: %s"% event_rule)
-    logger.debug("other params: %s"% other_params)
+    logger.debug("Going to add {} rule for {}".format(mode,workflow))
+    logger.debug("Rule names: {}".format(rule_name))
+    logger.debug("workflows: {}".format(workflow_name))
+    logger.debug("priority: {}".format(str(priority)))
+    logger.debug("rule: {}".format(event_rule))
+    logger.debug("other params: {}".format(other_params))
 
-    print("Going to add %s rule for %s"% (mode,workflow))
-    print("Rule names: %s"% rule_name)
-    print("workflows: %s"% workflow_name)
-    print("priority: %s"% str(priority))
-    print("rule: %s"% event_rule)
-    print("other params: %s"% other_params)
+    print("Going to add {} rule for {}".format(mode,workflow))
+    print("Rule names: {}".format(rule_name))
+    print("workflows: {}".format(workflow_name))
+    print("priority: {}".format(str(priority)))
+    print("rule: {}".format(event_rule))
+    print("other params: {}".format(other_params))
 
-    rules_info = "Added "+mode+"rule \n"
-    rules_info += "Rule name: %s"% rule_name+'\n'
-    rules_info += "workflow: %s"% workflow_name+'\n'
-    rules_info += "priority: %s"% str(priority)+'\n'
+    rules_info = "Added {} rule \n".format(mode)
+    rules_info += "Rule name: {}\n".format(rule_name)
+    rules_info += "workflow: {}\n".format(workflow_name)
+    rules_info += "priority: {}\n".format(str(priority))
     #rules_info += "event_rule: %s"% event_rule+"\n"
     #rules_info += "other params: %s"% other_params+'\n'
 
     add_user_rules.add_user_rule(projectName, rule_name, workflow_name, priority, event_rule, other_params)
-    logger.debug(mode+"rule added")
-    print(mode+"rule added")
+    logger.debug("{} rule added".format(mode))
+    print("{} rule added".format(mode))
 
     return rules_info
 

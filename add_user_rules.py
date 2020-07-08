@@ -153,11 +153,11 @@ def add_user_rule(projectName, rule_name, workflow, priority, query_string, othe
     r = requests.post('%s/%s/.percolator/' %
                       (es_url, es_index), data=json.dumps(new_doc))
     print("new_doc:\n{}".format(json.dumps(new_doc)))
-    print('Posting to %s/%s/.percolator/' % (es_url, es_index))
+    print('Posting to {}/{}/.percolator/'.format(es_url, es_index))
     result = r.json()
     if r.status_code != 201:
-        print("Failed to insert new rule for %s. Got status code %d:\n%s" %
-              (user_name, r.status_code, json.dumps(result, indent=2)))
+        print("Failed to insert new rule for {}. Got status code {}:\n{}".format(
+            user_name, r.status_code, json.dumps(result, indent=2)))
         logger.debug("Failed to insert new rule for %s. Got status code %d:\n%s" %
                      (user_name, r.status_code, json.dumps(result, indent=2)))
     r.raise_for_status()
