@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from builtins import str
 import os
 import sys
 import getpass
@@ -57,16 +58,16 @@ def send_email(sender, cc_recipients, bcc_recipients, subject, body, attachments
 
     # We must always pass Unicode strings to Header, otherwise it will
     # use RFC 2047 encoding even on plain ASCII strings.
-    sender_name = str(Header(unicode(sender_name), header_charset))
+    sender_name = str(Header(str(sender_name), header_charset))
     unicode_parsed_cc_recipients = []
     for recipient_name, recipient_addr in parsed_cc_recipients:
-        recipient_name = str(Header(unicode(recipient_name), header_charset))
+        recipient_name = str(Header(str(recipient_name), header_charset))
         # Make sure email addresses do not contain non-ASCII characters
         recipient_addr = recipient_addr.encode('ascii')
         unicode_parsed_cc_recipients.append((recipient_name, recipient_addr))
     unicode_parsed_bcc_recipients = []
     for recipient_name, recipient_addr in parsed_bcc_recipients:
-        recipient_name = str(Header(unicode(recipient_name), header_charset))
+        recipient_name = str(Header(str(recipient_name), header_charset))
         # Make sure email addresses do not contain non-ASCII characters
         recipient_addr = recipient_addr.encode('ascii')
         unicode_parsed_bcc_recipients.append((recipient_name, recipient_addr))
@@ -82,11 +83,11 @@ def send_email(sender, cc_recipients, bcc_recipients, subject, body, attachments
     msg['TO'] = "grfn-ops@jpl.nasa.gov"
     msg['BCC'] = COMMASPACE.join([formataddr((recipient_name, recipient_addr))
                                   for recipient_name, recipient_addr in unicode_parsed_bcc_recipients])
-    msg['Subject'] = Header(unicode(subject), header_charset)
+    msg['Subject'] = Header(str(subject), header_charset)
     msg.attach(MIMEText(body.encode(body_charset), 'plain', body_charset))
 
     # Add attachments
-    if isinstance(attachments, types.DictType):
+    if isinstance(attachments, dict):
         for fname in attachments:
             part = MIMEBase('application', "octet-stream")
             part.set_payload(attachments[fname])
@@ -151,7 +152,7 @@ def get_value(d, key):
             d = d[k]
         else:
             return None
-    if isinstance(d, types.ListType):
+    if isinstance(d, list):
         return ', '.join([str(i) for i in d])
     else:
         return d

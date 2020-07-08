@@ -1,3 +1,4 @@
+from builtins import str
 import json, getpass, requests
 import logging
 import sys, os, datetime
@@ -66,7 +67,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     if r.status_code != 200:
         r.raise_for_status()
     result = r.json()
-    if 'result' in result.keys() and 'success' in result.keys():
+    if 'result' in list(result.keys()) and 'success' in list(result.keys()):
         if result['success'] == True:
             job_id = result['result']
             print('submitted create_aoi:{} job: {} job_id: {}'.format(release, job, job_id))
