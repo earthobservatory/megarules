@@ -43,6 +43,11 @@
       "type": "boolean"
     },
     {
+      "name": "DPM_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
       "name": "ifg_workflow",
       "from": "value",
       "type": "text",
@@ -65,6 +70,12 @@
       "from": "value",
       "type": "text",
       "value": "hysds-io-slcp2cod_network_selector"
+    },
+    {
+      "name": "dpm_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-cod2dpm"
     },
     {
       "name": "SLCP_workflow_version",
@@ -93,6 +104,13 @@
       "type": "jobspec_version",
       "version_regex": "job-slcp2cod_network_selector",
       "placeholder": "cod job version"
+    },
+    {
+      "name": "DPM_workflow_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-cod2dpm",
+      "placeholder": "dpm job version"
     },
     {
       "name": "track_number",

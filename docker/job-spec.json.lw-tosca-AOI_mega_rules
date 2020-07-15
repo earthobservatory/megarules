@@ -34,6 +34,10 @@
       "destination": "context"
     },
     {
+      "name": "DPM_processing",
+      "destination": "context"
+    },
+    {
       "name": "ifg_workflow",
       "destination": "context"
     },
@@ -50,6 +54,10 @@
       "destination": "context"
     },
     {
+      "name": "dpm_workflow",
+      "destination": "context"
+    },
+    {
       "name": "SLCP_workflow_version",
       "destination": "context"
     },
@@ -63,6 +71,10 @@
     },
     {
       "name": "COD_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "DPM_workflow_version",
       "destination": "context"
     },
     {

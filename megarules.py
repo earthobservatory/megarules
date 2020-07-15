@@ -171,6 +171,8 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         rule_name = mode+'lar_'+AOI_name
     elif workflow.find("cod") != -1:
         rule_name = mode+'cod_'+AOI_name
+    elif workflow.find("dpm") != -1:
+        rule_name = mode+'dpm_'+AOI_name
 
     logger.debug("Kicking off rules for response: {}".format(rule_name))
     print("Kicking off rules for response: {}".format(rule_name))
@@ -187,6 +189,9 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
     elif workflow.find("cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "temporal_baseline": temporal_baseline, "aoi_name":AOI_name}
+    elif workflow.find("dpm") != -1:
+        event_rule = rule_generation(open_ended, '"S1-COD"', track_number, start_time, end_time, coordinates, passthrough)
+        other_params = {"event_name":AOI_name}
 
     logger.debug("Going to add {} rule for {}".format(mode,workflow))
     logger.debug("Rule names: {}".format(rule_name))
@@ -275,6 +280,8 @@ def add_email_rule(AOI_name, dataset, track_number, passthrough, event_time, coo
         product_type = "lar"
     elif dataset == "S1-COD":
         product_type = "cod"
+    elif dataset == "S1-DPM":
+        product_type = "dpm"
 
     email_rule_set = co_event_rule(passthrough, dataset, track_number, event_time, json.dumps(coordinates))
     other_params = {"emails": emails}
@@ -311,7 +318,7 @@ def convert_datetime_for_slcp(date_time):
     new_time = time.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
     return new_time
 
-def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, slcp_workflow_version, lar_workflow_version, ifg_workflow_version, cod_workflow_version, projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails):
+def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, dpm_rule, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow, slcp_workflow_version, lar_workflow_version, ifg_workflow_version, cod_workflow_version, dpm_workflow_version, projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails):
 
     rule_names = []
     rules_info = ''
@@ -335,6 +342,9 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 # if it's a not event the don't add cod rule
                 print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
                 #rules_info += add_rule('', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', 4)
+            if dpm_rule == True:
+                # if it's a not event the don't add dpm rule
+                print("DPM rules are only added for events. So ignoreing DPM_processing set to true flag.")
         else:
             # add pre-event, post-event and co-event trigger rules
             if ifg_rule == True:
@@ -370,6 +380,13 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 #add mail rule
                 rules_info += add_email_rule(AOI_name, "S1-COD", track_number, passthrough, event_time, coordinates, emails)
                 rule_names.extend([AOI_name+"-cod_email"])
+            if dpm_rule == True:
+                # add event rule
+                rules_info += add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, 7)
+                rule_names.extend(['event-dpm_'+AOI_name])
+                #add mail rule
+                rules_info += add_email_rule(AOI_name, "S1-DPM", track_number, passthrough, event_time, coordinates, emails)
+                rule_names.extend([AOI_name+"-dpm_email"])
     else:
         logging.debug("Start time exists but no end time specified")
         if event_time == '':
@@ -389,6 +406,10 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 #not adding COD because this is not an event
                 print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
                 #rule_names.extend(['cod_'+AOI_name])
+            if dpm_rule:
+                #not adding DPM because this is not an event
+                print("DPM rules are only added for events. So ignoreing DPM_processing set to true flag.")
+                #rule_names.extend(['dpm_'+AOI_name])
         else:
             #start time and event time given
             logging.debug("Need to add a pre-event and post event needs to be added")
@@ -422,12 +443,18 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
 
             if cod_rule == True:
                 rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, 7)
-
                 rule_names.extend(["event-cod_"+AOI_name])
                 #add email rule
                 rules_info += add_email_rule(AOI_name, "S1-COD", track_number, passthrough, event_time, coordinates, emails)
                 rule_names.extend([AOI_name+"-cod_email"])
 
+            if dpm_rule == True:
+                rules_info += add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, 7)
+                rule_names.extend(["event-dpm_"+AOI_name])
+                #add email rule
+                rules_info += add_email_rule(AOI_name, "S1-DPM", track_number, passthrough, event_time, coordinates, emails)
+                rule_names.extend([AOI_name+"-dpm_email"])
+                
     #send out email to admin
     # logger.debug("Sending email to admin with details of rules created")
     # print("Sending email to admin with details of rules created")
@@ -460,16 +487,19 @@ if __name__ == "__main__":
     slcp = ctx['SLCP_processing']
     lar = ctx['LAR_processing']
     cod = ctx['COD_processing']
+    dpm = ctx['DPM_processing']
 
     ifg_workflow = ctx['ifg_workflow']
     slcp_workflow= ctx['slcp_workflow']
     lar_workflow = ctx['lar_workflow']
     cod_workflow = ctx['cod_workflow']
+    dpm_workflow = ctx['dpm_workflow']
 
     ifg_version = ctx['IFG_workflow_version']
     slcp_version = ctx['SLCP_workflow_version']
     lar_version = ctx['LAR_workflow_version']
     cod_version = ctx['COD_workflow_version']
+    dpm_version = ctx['DPM_workflow_version']
 
     azimuth_looks = ctx['azimuth_looks']
     range_looks = ctx['range_looks']
@@ -505,4 +535,4 @@ if __name__ == "__main__":
     else:
         eventtime = result["hits"]["hits"][0]["_source"]["metadata"]["eventtime"]
 
-    mega_rules(AOI_name, coordinates, slcp, lar, ifg, cod, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, slcp_version, lar_version, ifg_version, cod_version, projectName, starttime, endtime, eventtime, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails)
+    mega_rules(AOI_name, coordinates, slcp, lar, ifg, cod, dpm, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow, slcp_version, lar_version, ifg_version, cod_version, dpm_version, projectName, starttime, endtime, eventtime, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails)
