@@ -414,13 +414,13 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend([AOI_name+"-cod_email"])
 
     #send out email to admin
-    logger.debug("Sending email to admin with details of rules created")
-    print("Sending email to admin with details of rules created")
+    # logger.debug("Sending email to admin with details of rules created")
+    # print("Sending email to admin with details of rules created")
 
-    if emails != '':
-        email_to_user(emails, projectName, rule_names, rules_info)
-        logger.debug("Email sent to admin")
-        print("Email sent to admin")
+    # if emails != '':
+    #     email_to_user(emails, projectName, rule_names, rules_info)
+    #     logger.debug("Email sent to admin")
+    #     print("Email sent to admin")
 
     #end of mega_rules
 
