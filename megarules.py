@@ -169,9 +169,9 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         rule_name = mode+'slcp_'+AOI_name
     elif workflow.endswith("lar"):
         rule_name = mode+'lar_'+AOI_name
-    elif workflow.find("cod") != -1:
+    elif workflow.find("slcp2cod") != -1:
         rule_name = mode+'cod_'+AOI_name
-    elif workflow.find("dpm") != -1:
+    elif workflow.find("cod2dpm") != -1:
         rule_name = mode+'dpm_'+AOI_name
 
     logger.debug("Kicking off rules for response: {}".format(rule_name))
@@ -454,7 +454,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, d
                 #add email rule
                 rules_info += add_email_rule(AOI_name, "S1-DPM", track_number, passthrough, event_time, coordinates, emails)
                 rule_names.extend([AOI_name+"-dpm_email"])
-                
+
     #send out email to admin
     # logger.debug("Sending email to admin with details of rules created")
     # print("Sending email to admin with details of rules created")
