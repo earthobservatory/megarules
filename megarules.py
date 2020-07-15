@@ -9,6 +9,8 @@ from string import Template
 from hysds.celery import app
 import add_user_rules
 import notify_by_email 
+import datetime
+from dateutil.parser import parse
 
 #Setup logger for this job here.  Should log to STDOUT or STDERR as this is a job
 logging.basicConfig(level=logging.DEBUG)
@@ -304,6 +306,11 @@ def add_email_rule(AOI_name, dataset, track_number, passthrough, event_time, coo
         
     return rules_info
 
+def convert_datetime_for_slcp(date_time):
+    time = parse(date_time)
+    new_time = time.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
+    return new_time
+
 def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, slcp_workflow_version, lar_workflow_version, ifg_workflow_version, cod_workflow_version, projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails):
 
     rule_names = []
@@ -317,6 +324,8 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rules_info += add_rule('', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 4)
                 rule_names.extend(['ifg_'+AOI_name])
             if slcp_rule == True:
+                start_time = convert_datetime_for_slcp(start_time)
+                end_time = convert_datetime_for_slcp(end_time)
                 rules_info += add_rule('', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 4)
                 rule_names.extend(['slcp_'+AOI_name])
             if lar_rule == True:
@@ -339,6 +348,9 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rules_info += add_email_rule(AOI_name, "S1-IFG", track_number, passthrough, event_time, coordinates, emails)
                 rule_names.extend([AOI_name+"-ifg_email"])
             if slcp_rule == True:
+                start_time = convert_datetime_for_slcp(start_time)
+                event_time = convert_datetime_for_slcp(event_time)
+                end_time = convert_datetime_for_slcp(end_time)
                 rules_info += add_rule('event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 7)
                 rule_names.extend(["event-slcp_"+AOI_name, "post-event-slcp_"+AOI_name])
                 #add email rule
@@ -367,6 +379,7 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rules_info += add_rule('', True, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 4)
                 rule_names.extend(['ifg_'+AOI_name])
             if slcp_rule:
+                start_time = convert_datetime_for_slcp(start_time)
                 rules_info += add_rule('', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 4)
                 rule_names.extend(['slcp_'+AOI_name])
             if lar_rule:
@@ -390,6 +403,8 @@ def mega_rules(AOI_name, coordinates, slcp_rule, lar_rule, ifg_rule, cod_rule, s
                 rule_names.extend([AOI_name+"-ifg_email"])
 
             if slcp_rule == True:
+                start_time = convert_datetime_for_slcp(start_time)
+                event_time = convert_datetime_for_slcp(event_time)
                 rules_info += add_rule('pre-event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 7)
 
                 rules_info += add_rule('post-event-', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, 7)
@@ -485,9 +500,9 @@ if __name__ == "__main__":
     else:
         endtime = result["hits"]["hits"][0]["_source"]["endtime"]
 
-    if 'event' not in result["hits"]["hits"][0]["_source"]["metadata"]:
+    if 'eventtime' not in result["hits"]["hits"][0]["_source"]["metadata"]:
         logger.info("AOI doesn't have associated eventtime")
     else:
-        eventtime = result["hits"]["hits"][0]["_source"]["metadata"]["event"]["time"]
+        eventtime = result["hits"]["hits"][0]["_source"]["metadata"]["eventtime"]
 
     mega_rules(AOI_name, coordinates, slcp, lar, ifg, cod, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, slcp_version, lar_version, ifg_version, cod_version, projectName, starttime, endtime, eventtime, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, emails)

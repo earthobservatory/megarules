@@ -1,5 +1,5 @@
 {
-  "required_queues":["factotum-create_aoi-queue"],
+  "required_queues":["factotum-job_worker-small"],
   "command":"/home/ops/verdi/ops/megarules/megarules.sh",
   "disk_usage":"3GB",
   "soft_time_limit": 300,
