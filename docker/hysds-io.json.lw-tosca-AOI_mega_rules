@@ -1,26 +1,38 @@
 {
-  "label" : "Mega Rules",
-  "submission_type":"individual",
-  "allowed_accounts": [ "ops" ],
-  "component" : "tosca",
-  "params" : [
+  "label": "Mega Rules",
+  "submission_type": "individual",
+  "allowed_accounts": [
+    "ops"
+  ],
+  "component": "tosca",
+  "params": [
     {
       "name": "project_name",
       "from": "submitter",
       "type": "enum",
-      "enumerables": ["grfn", "aria", "urgent-response", "mem", "dwr"]
+      "enumerables": [
+        "grfn",
+        "aria",
+        "urgent-response",
+        "mem",
+        "dwr"
+      ]
     },
     {
       "name": "AOI_name",
       "from": "submitter",
       "type": "text",
-      "placeholder":"name of Area of Interest"
+      "placeholder": "name of Area of Interest"
     },
     {
       "name": "AOI_type",
       "from": "submitter",
       "type": "enum",
-      "enumerables": ["pdl_event","urgent_response","monitoring"]
+      "enumerables": [
+        "pdl_event",
+        "urgent_response",
+        "monitoring"
+      ]
     },
     {
       "name": "IFG_processing",
@@ -123,7 +135,7 @@
       "name": "temporal_baseline",
       "type": "text",
       "from": "submitter",
-      "placeholder":"no. of days to look back for product pairs"
+      "placeholder": "no. of days to look back for product pairs"
     },
     {
       "name": "query",
@@ -134,7 +146,7 @@
       "name": "minimum_pair",
       "from": "submitter",
       "type": "text",
-      "placeholder":"min no. of pairs guaranteed to be processed"
+      "placeholder": "min no. of pairs guaranteed to be processed"
     },
     {
       "name": "range_looks",
@@ -152,7 +164,7 @@
       "optional": true,
       "default": "3"
     },
-    { 
+    {
       "name": "filter_strength",
       "from": "submitter",
       "type": "number",
@@ -163,7 +175,12 @@
       "from": "submitter",
       "type": "enum",
       "default": "SRTM+v3",
-      "enumerables": ["SRTM+v3", "NED1", "NED13", "NED13-downsampled"]
+      "enumerables": [
+        "SRTM+v3",
+        "NED1",
+        "NED13",
+        "NED13-downsampled"
+      ]
     },
     {
       "name": "coverage_threshold",
@@ -181,11 +198,46 @@
       "optional": true
     },
     {
+      "name": "slcp_version",
+      "from": "submitter",
+      "type": "text",
+      "default": "v1.2"
+    },
+    {
+      "name": "overriding_range_looks",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "default": "16,16,16",
+      "placeholder": "(optional) comma sep. looks across subswaths e.g. 7,8,9"
+    },
+    {
+      "name": "overriding_azimuth_looks",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "placeholder": "(optional) comma sep. looks across subswaths e.g. 2,2,2"
+    },
+    {
+      "name": "minmatch",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "default": "1"
+    },
+    {
+      "name": "min_overlap",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "default": "0.3"
+    },
+    {
       "name": "emails",
       "from": "submitter",
       "type": "text",
       "placeholder": "for email notification",
-      "optional":true
+      "optional": true
     },
     {
       "name": "username",

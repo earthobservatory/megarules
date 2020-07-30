@@ -1,10 +1,12 @@
 {
-  "required_queues":["factotum-job_worker-small"],
-  "command":"/home/ops/verdi/ops/megarules/megarules.sh",
-  "disk_usage":"3GB",
+  "required_queues": [
+    "factotum-job_worker-small"
+  ],
+  "command": "/home/ops/verdi/ops/megarules/megarules.sh",
+  "disk_usage": "3GB",
   "soft_time_limit": 300,
   "time_limit": 360,
-  "params" : [
+  "params": [
     {
       "name": "project_name",
       "destination": "context"
@@ -101,7 +103,7 @@
       "name": "azimuth_looks",
       "destination": "context"
     },
-    { 
+    {
       "name": "filter_strength",
       "destination": "context"
     },
@@ -115,6 +117,26 @@
     },
     {
       "name": "dataset_tag",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_version",
+      "destination": "positional"
+    },
+    {
+      "name": "overriding_azimuth_looks",
+      "destination": "context"
+    },
+    {
+      "name": "overriding_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "minmatch",
+      "destination": "context"
+    },
+    {
+      "name": "min_overlap",
       "destination": "context"
     },
     {
