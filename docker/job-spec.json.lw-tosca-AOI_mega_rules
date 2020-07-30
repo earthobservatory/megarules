@@ -140,10 +140,6 @@
       "destination": "context"
     },
     {
-      "name": "emails",
-      "destination": "context"
-    },
-    {
       "name": "username",
       "destination": "context"
     },

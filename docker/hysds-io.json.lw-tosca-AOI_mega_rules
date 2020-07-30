@@ -11,11 +11,8 @@
       "from": "submitter",
       "type": "enum",
       "enumerables": [
-        "grfn",
         "aria",
-        "urgent-response",
-        "mem",
-        "dwr"
+        "urgent-response"
       ]
     },
     {
@@ -29,9 +26,8 @@
       "from": "submitter",
       "type": "enum",
       "enumerables": [
-        "pdl_event",
-        "urgent_response",
-        "monitoring"
+        "monitoring",
+        "urgent_response"
       ]
     },
     {
@@ -129,13 +125,13 @@
       "from": "submitter",
       "type": "text",
       "optional": true,
-      "default": "not_specified"
+      "placeholder": "optional"
     },
     {
       "name": "temporal_baseline",
       "type": "text",
       "from": "submitter",
-      "placeholder": "no. of days to look back for product pairs"
+      "placeholder": "number of days to look back for product pairs"
     },
     {
       "name": "query",
@@ -146,7 +142,7 @@
       "name": "minimum_pair",
       "from": "submitter",
       "type": "text",
-      "placeholder": "min no. of pairs guaranteed to be processed"
+      "placeholder": "min number of pairs guaranteed to be processed"
     },
     {
       "name": "range_looks",
@@ -231,13 +227,6 @@
       "type": "text",
       "optional": true,
       "default": "0.3"
-    },
-    {
-      "name": "emails",
-      "from": "submitter",
-      "type": "text",
-      "placeholder": "for email notification",
-      "optional": true
     },
     {
       "name": "username",

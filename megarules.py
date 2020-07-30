@@ -505,7 +505,7 @@ if __name__ == "__main__":
     range_looks = ctx['range_looks']
     filter_strength = ctx["filter_strength"]
     dem_type = ctx["dem_type"]
-    emails = ctx['emails']
+    emails = ""
     passthrough = ctx['query']
     coverage_threshold = ctx['coverage_threshold']
     dataset_tag = ctx['dataset_tag']
