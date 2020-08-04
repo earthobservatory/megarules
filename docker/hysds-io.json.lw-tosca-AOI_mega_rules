@@ -131,7 +131,8 @@
       "name": "temporal_baseline",
       "type": "text",
       "from": "submitter",
-      "placeholder": "number of days to look back for product pairs"
+      "placeholder": "number of days to look back for product pairs",
+      "default": "12"
     },
     {
       "name": "query",
@@ -142,7 +143,8 @@
       "name": "minimum_pair",
       "from": "submitter",
       "type": "text",
-      "placeholder": "min number of pairs guaranteed to be processed"
+      "placeholder": "min number of pairs guaranteed to be processed",
+      "default": "1"
     },
     {
       "name": "range_looks",
@@ -227,6 +229,100 @@
       "type": "text",
       "optional": true,
       "default": "0.3"
+    },
+    {
+      "name": "include",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "glob pattern for DPM files to include (comma sep)",
+      "default": "./S1-COD*/diff*.cor.geo"
+    },
+    {
+      "name": "exclude",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "glob pattern for DPM files to exclude (comma sep)",
+      "optional": true,
+      "default": "./S1-COD*/cor*,./S1-COD*/cor2*"
+    },
+    {
+      "name": "event_name",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "EOS_ARIA-SG_DPM_YYYYMMDD_EventArea"
+    },
+    {
+      "name": "thr_cod",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "threshold for COD value from 0.4 to 0.7 (higher values -> lesser pixels)",
+      "default": "0.45"
+    },
+    {
+      "name": "gamma",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "gamma value to control alpha channel gradient, default=1.2",
+      "default": "1.2"
+    },
+    {
+      "name": "thr_alpha",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "threshold below which pixels will be masked with alpha=0, default=0.6",
+      "default": "0.6"
+    },
+    {
+      "name": "band1",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "band4",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "name": "yellow_to_red",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "blues",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "false"
+    },
+    {
+      "name": "merge",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "rmburst",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "kml",
+      "from": "submitter",
+      "type": "enum",
+      "enumerables": [
+        "kml_gdal",
+        "kml_overlay"
+      ]
+    },
+    {
+      "name": "kml_url",
+      "from": "submitter",
+      "type": "text",
+      "placeholder": "s3 url to host tiles, empty if you'd like to use current datasets bucket",
+      "optional": true
     },
     {
       "name": "username",

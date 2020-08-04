@@ -140,6 +140,62 @@
       "destination": "context"
     },
     {
+      "name": "include",
+      "destination": "context"
+    },
+    {
+      "name": "exclude",
+      "destination": "context"
+    },
+    {
+      "name": "event_name",
+      "destination": "context"
+    },
+    {
+      "name": "thr_cod",
+      "destination": "context"
+    },
+    {
+      "name": "gamma",
+      "destination": "context"
+    },
+    {
+      "name": "thr_alpha",
+      "destination": "context"
+    },
+    {
+      "name": "band1",
+      "destination": "context"
+    },
+    {
+      "name": "band4",
+      "destination": "context"
+    },
+    {
+      "name": "yellow_to_red",
+      "destination": "context"
+    },
+    {
+      "name": "blues",
+      "destination": "context"
+    },
+    {
+      "name": "merge",
+      "destination": "context"
+    },
+    {
+      "name": "rmburst",
+      "destination": "context"
+    },
+    {
+      "name": "kml",
+      "destination": "context"
+    },
+    {
+      "name": "kml_url",
+      "destination": "context"
+    },
+    {
       "name": "username",
       "destination": "context"
     },
