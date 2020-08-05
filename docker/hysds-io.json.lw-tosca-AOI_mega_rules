@@ -123,9 +123,9 @@
     {
       "name": "track_number",
       "from": "submitter",
-      "type": "number",
+      "type": "text",
       "optional": true,
-      "placeholder": "optional"
+      "default": "not_specified"
     },
     {
       "name": "temporal_baseline",
