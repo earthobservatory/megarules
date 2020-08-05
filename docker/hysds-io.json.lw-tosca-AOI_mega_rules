@@ -123,13 +123,13 @@
     {
       "name": "track_number",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "optional": true,
       "placeholder": "optional"
     },
     {
       "name": "temporal_baseline",
-      "type": "text",
+      "type": "number",
       "from": "submitter",
       "placeholder": "number of days to look back for product pairs",
       "default": "12"
@@ -142,7 +142,7 @@
     {
       "name": "minimum_pair",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "placeholder": "min number of pairs guaranteed to be processed",
       "default": "1"
     },
@@ -219,14 +219,14 @@
     {
       "name": "minmatch",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "optional": true,
       "default": "1"
     },
     {
       "name": "min_overlap",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "optional": true,
       "default": "0.3"
     },
@@ -254,21 +254,21 @@
     {
       "name": "thr_cod",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "placeholder": "threshold for COD value from 0.4 to 0.7 (higher values -> lesser pixels)",
       "default": "0.45"
     },
     {
       "name": "gamma",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "placeholder": "gamma value to control alpha channel gradient, default=1.2",
       "default": "1.2"
     },
     {
       "name": "thr_alpha",
       "from": "submitter",
-      "type": "text",
+      "type": "number",
       "placeholder": "threshold below which pixels will be masked with alpha=0, default=0.6",
       "default": "0.6"
     },
