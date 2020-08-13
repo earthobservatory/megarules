@@ -12,6 +12,7 @@ import notify_by_email
 import datetime
 from dateutil.parser import parse
 
+
 #Setup logger for this job here.  Should log to STDOUT or STDERR as this is a job
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("hysds")
@@ -112,9 +113,14 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
             track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
 
     if open_ended is False:
-        file_rule = open(os.path.join(BASE_PATH, 'ifg_query.json'))
-        rule_query_temp = Template( file_rule.read())
-        rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
+        if dataset_type == '"S1-COD"':
+            file_rule = open(os.path.join(BASE_PATH, 'dpm_query.json'))
+            rule_query_temp = Template( file_rule.read())
+            rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
+        else:
+            file_rule = open(os.path.join(BASE_PATH, 'ifg_query.json'))
+            rule_query_temp = Template( file_rule.read())
+            rule_query = rule_query_temp.substitute({'dataset_type':dataset_type,'passthrough':pass_str, 'track_number':track_condition ,'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
     else:
         file_rule = open(os.path.join(BASE_PATH, 'open_ended_query.json'))
         rule_query_temp = Template( file_rule.read())

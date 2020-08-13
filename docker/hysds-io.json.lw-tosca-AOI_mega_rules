@@ -125,7 +125,7 @@
       "from": "submitter",
       "type": "text",
       "optional": true,
-      "default": "not_specified"
+      "placeholder": "(optional) specify track number to be queried"
     },
     {
       "name": "temporal_baseline",
