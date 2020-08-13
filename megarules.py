@@ -98,9 +98,7 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
     else:
         pass_str = ''
 
-    if track_number == 'not_specified':
-        track_condition = ''
-    else:
+    if track_number:
         if "," in track_number:
             tracks = track_number.split(",")
             track_json = ''
@@ -111,6 +109,8 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
             track_condition += "]}},"
         else:
             track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
+    else:
+        track_condition = ''
 
     if open_ended is False:
         if dataset_type == '"S1-COD"':
@@ -138,9 +138,7 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
     else:
             pass_str = ''
 
-    if track_number == 'not_specified':
-        track_condition = ''
-    else:
+    if track_number:
         if "," in track_number:
             tracks = track_number.split(",")
             track_json = ''
@@ -151,6 +149,8 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
             track_condition += "]}},"
         else:
             track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
+    else:
+        track_condition = ''
 
     co_seismic_rule = open(os.path.join(BASE_PATH, 'co_event_condition.json'))
     rule_temp = Template( co_seismic_rule.read())
