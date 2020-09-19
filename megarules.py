@@ -549,7 +549,7 @@ if __name__ == "__main__":
     dpm_workflow = ctx['dpm_workflow']
 
     acq_version = ctx['acquisitions_scraper_workflow_version']
-    slc_version = ctx['slc_workflow_version']
+    slc_version = ctx['SLC_workflow_version']
     ifg_version = ctx['IFG_workflow_version']
     slcp_version = ctx['SLCP_workflow_version']
     lar_version = ctx['LAR_workflow_version']
