@@ -250,6 +250,7 @@
       "from": "submitter",
       "type": "text",
       "optional": true,
+      "default": "4,4,4",
       "placeholder": "(optional) comma sep. looks across subswaths e.g. 2,2,2"
     },
     {
