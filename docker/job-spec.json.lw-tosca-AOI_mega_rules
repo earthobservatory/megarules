@@ -52,7 +52,7 @@
       "destination": "context"
     },
     {
-      "name": "SLC_workflow",
+      "name": "slc_workflow",
       "destination": "context"
     },
     {
