@@ -20,6 +20,14 @@
       "destination": "context"
     },
     {
+      "name": "acquisitions_scraper_processing",
+      "destination": "context"
+    },
+    {
+      "name": "SLC_processing",
+      "destination": "context"
+    },
+    {
       "name": "IFG_processing",
       "destination": "context"
     },
@@ -40,6 +48,14 @@
       "destination": "context"
     },
     {
+      "name": "acquisitions_scraper_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "SLC_workflow",
+      "destination": "context"
+    },
+    {
       "name": "ifg_workflow",
       "destination": "context"
     },
@@ -57,6 +73,14 @@
     },
     {
       "name": "dpm_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "acquisitions_scraper_workflow_version",
+      "destination": "context"
+    },
+    {
+      "name": "SLC_workflow_version",
       "destination": "context"
     },
     {

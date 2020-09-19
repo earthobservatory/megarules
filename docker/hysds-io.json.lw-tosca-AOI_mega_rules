@@ -31,6 +31,16 @@
       ]
     },
     {
+      "name": "acquisitions_scraper_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "SLC_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
       "name": "IFG_processing",
       "from": "submitter",
       "type": "boolean"
@@ -54,6 +64,18 @@
       "name": "DPM_processing",
       "from": "submitter",
       "type": "boolean"
+    },
+    {
+      "name": "acquisitions_scraper_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-aoi_based_acq_submitter"
+    },
+    {
+      "name": "slc_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-acquisition_localizer_multi"
     },
     {
       "name": "ifg_workflow",
@@ -84,6 +106,20 @@
       "from": "value",
       "type": "text",
       "value": "hysds-io-cod2dpm"
+    },
+    {
+      "name": "acquisitions_scraper_workflow_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-aoi_based_acq_submitter",
+      "placeholder": "acquisitions scraper job version"
+    },
+    {
+      "name": "SLC_workflow_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-acquisition_localizer_multi",
+      "placeholder": "slc job version"
     },
     {
       "name": "SLCP_workflow_version",

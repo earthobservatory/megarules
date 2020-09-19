@@ -1,0 +1,30 @@
+{
+  "filtered": {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "term": {
+              "dataset.raw": "acquisition-S1-IW_SLC"
+            }
+          },
+          {
+            "range": {
+              "starttime": {
+                "from": $start_time,
+                "to": $end_time
+              }
+            }
+          }
+        ]
+      }
+    },
+    "filter": {
+      "geo_shape": {
+        "location": {
+          "shape": $coordinates
+        }
+      }
+    }
+  }
+}
