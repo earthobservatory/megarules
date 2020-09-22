@@ -138,8 +138,8 @@
     {
       "name": "IFG_workflow_version",
       "from": "value",
-      "value": "",
       "type": "text",
+      "value": ""
     },
     {
       "name": "COD_workflow_version",
