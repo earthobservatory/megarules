@@ -23,7 +23,7 @@
       "enumerables": ["pdl_event","urgent_response","monitoring"]
     },
     {
-      "name": "IFG_processing",
+      "name": "Multi-Localizer",
       "from": "submitter",
       "type": "boolean"
     },
@@ -43,10 +43,10 @@
       "type": "boolean"
     },
     {
-      "name": "ifg_workflow",
+      "name": "localizer_workflow",
       "from": "value",
       "type": "text",
-      "value": "hysds-io-sciflo-s1-ifg"
+      "value": "hysds-io-acquisition_localizer_multi"
     },
     {
       "name": "slcp_workflow",
@@ -67,27 +67,11 @@
       "value": "hysds-io-slcp2cod_network_selector"
     },
     {
-      "name": "IFG_workflow_version",
+      "name": "Multi-localizer_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
-      "version_regex": "job-sciflo-s1-ifg",
-      "placeholder": "ifg job version"
-    },
-    {
-      "name": "ifg_range_looks",
-      "from": "submitter",
-      "type": "number",
-      "placeholder": "input for IFG",
-      "optional": true,
-      "default": "7"
-    },
-    {
-      "name": "ifg_azimuth_looks",
-      "from": "submitter",
-      "type": "number",
-      "placeholder": "input for IFG",
-      "optional": true,
-      "default": "3"
+      "version_regex": "job-acquisition_localizer_multi",
+      "placeholder": "localizer job version"
     },
     {
       "name": "SLCP_workflow_version",

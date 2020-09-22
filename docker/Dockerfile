@@ -1,4 +1,4 @@
-FROM hysds/pge-base
+FROM hysds/pge-base:latest
 
 MAINTAINER malarout "Namrata.Malarout@jpl.nasa.gov"
 LABEL description="Job to automate AOI creation and trigger rules"
@@ -6,17 +6,6 @@ LABEL description="Job to automate AOI creation and trigger rules"
 ARG id
 ARG gid
 
-#Change UID and GID from build
-USER root
-# RUN set -ex && \
- #  usermod -u ${id} ops && \
- #  groupmod -g ${gid} ops && \
- #  chown -R ops:ops /home/ops/ /data && \
- #  usermod -g ${gid} ops
-
-#install redis
-RUN set -ex && \
-  yum install -y redis
 
 # create work directory
 RUN set -ex \
