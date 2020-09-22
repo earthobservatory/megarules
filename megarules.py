@@ -96,7 +96,7 @@ def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_ti
     job_name = "acquisition_localizer_multi_{}".format(AOI_name)
     job_params = {}
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
-    submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
+    submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
 def submit_acq_submitter_job(AOI_name, job_type, release):
     job_name = "acq_submitter_{}".format(AOI_name)
@@ -104,7 +104,7 @@ def submit_acq_submitter_job(AOI_name, job_type, release):
     dataset_tag = "acq_submitter_{}".format(AOI_name)
     condition = {"query":{"bool": {"must": [{"term": {"dataset_type.raw": "area_of_interest"}},{"query_string": {"query": '_id:"AOI"',"default_operator": "OR"}}]}}}
     condition["query"]["bool"]["must"][1]["query_string"]["query"] = '_id:"'+AOI_name+'"'
-    submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
+    submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
 
 def rule_generation(open_ended, dataset_type, track_number, start_time, end_time, coordinates, passthrough):
