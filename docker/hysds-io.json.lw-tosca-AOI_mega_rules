@@ -138,6 +138,7 @@
     {
       "name": "IFG_workflow_version",
       "from": "submitter",
+      "optional": true,
       "type": "jobspec_version",
       "version_regex": "job-sciflo-s1-ifg",
       "placeholder": "ifg job version"
