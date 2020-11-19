@@ -176,6 +176,14 @@
       "destination": "context"
     },
     {
+      "name": "dpmraw",
+      "destination": "context"
+    },
+    {
+      "name": "dpm",
+      "destination": "context"
+    },
+    {
       "name": "thr_cod",
       "destination": "context"
     },

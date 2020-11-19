@@ -289,6 +289,18 @@
       "placeholder": "EOS_ARIA-SG_DPM_YYYYMMDD_EventArea"
     },
     {
+      "name": "dpmraw",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
+      "name": "dpm",
+      "from": "submitter",
+      "type": "boolean",
+      "default": "true"
+    },
+    {
       "name": "thr_cod",
       "from": "submitter",
       "type": "number",
