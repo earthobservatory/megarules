@@ -403,7 +403,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                 end_time = convert_datetime_for_slcp(end_time)
                 if acq_rule == True:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule == True:
                     # submit job to scrape slcs based on AOI and acquisitons
                     submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
@@ -445,7 +445,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                 start_time = convert_datetime_for_slcp(start_time)
                 if acq_rule == True:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule == True:
                     # submit job to scrape slcs based on AOI and acquisitons
                     submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
@@ -480,7 +480,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                 event_time = convert_datetime_for_slcp(event_time)
                 if acq_rule == True:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule == True:
                     # submit job to scrape slcs based on AOI and acquisitons
                     submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
