@@ -108,7 +108,8 @@ def submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, job_ty
     job_params = {"AOI_name": AOI_name,
                   "spatial_extent":coordinates,
                   "start_time":start_time,
-                  "end_time":end_time}
+                  "end_time":end_time,
+                  "dataset_version":'v2.0'}
     dataset_tag = "acq_submitter_{}".format(AOI_name)
     condition = {"query":{"bool": {"must": [{"term": {"dataset_type.raw": "area_of_interest"}},{"query_string": {"query": '_id:"AOI"',"default_operator": "OR"}}]}}}
     condition["query"]["bool"]["must"][1]["query_string"]["query"] = '_id:"'+AOI_name+'"'
