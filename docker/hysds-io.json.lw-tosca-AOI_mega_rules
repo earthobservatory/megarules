@@ -22,15 +22,6 @@
       "placeholder": "name of Area of Interest"
     },
     {
-      "name": "AOI_type",
-      "from": "submitter",
-      "type": "enum",
-      "enumerables": [
-        "monitoring",
-        "urgent_response"
-      ]
-    },
-    {
       "name": "acquisitions_scraper_processing",
       "from": "submitter",
       "type": "boolean"

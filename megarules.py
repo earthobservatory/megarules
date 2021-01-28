@@ -103,9 +103,12 @@ def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_ti
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
     submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
-def submit_acq_submitter_job(AOI_name, job_type, release):
+def submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, job_type, release):
     job_name = "acq_submitter_{}".format(AOI_name)
-    job_params = {}
+    job_params = {"AOI_name": AOI_name,
+                  "spatial_extent":coordinates,
+                  "start_time":start_time,
+                  "end_time":end_time}
     dataset_tag = "acq_submitter_{}".format(AOI_name)
     condition = {"query":{"bool": {"must": [{"term": {"dataset_type.raw": "area_of_interest"}},{"query_string": {"query": '_id:"AOI"',"default_operator": "OR"}}]}}}
     condition["query"]["bool"]["must"][1]["query_string"]["query"] = '_id:"'+AOI_name+'"'
@@ -366,7 +369,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                 end_time = convert_datetime_for_slcp(end_time)
                 if acq_rule == True:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule == True:
                     # submit job to scrape slcs based on AOI and acquisitons
                     submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)

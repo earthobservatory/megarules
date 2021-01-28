@@ -16,10 +16,6 @@
       "destination": "context"
     },
     {
-      "name": "AOI_type",
-      "destination": "context"
-    },
-    {
       "name": "acquisitions_scraper_processing",
       "destination": "context"
     },
