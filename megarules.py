@@ -97,7 +97,7 @@ def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_ti
     job_name = "acquisition_localizer_multi_{}".format(AOI_name)
     job_params = {}
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
-    submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
+    submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
 def submit_acq_submitter_job(AOI_name, job_type, release):
     job_name = "acq_submitter_{}".format(AOI_name)

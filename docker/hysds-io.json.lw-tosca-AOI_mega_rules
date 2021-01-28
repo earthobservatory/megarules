@@ -137,10 +137,9 @@
     },
     {
       "name": "IFG_workflow_version",
-      "from": "submitter",
-      "type": "jobspec_version",
-      "version_regex": "job-sciflo-s1-ifg",
-      "placeholder": "ifg job version"
+      "from": "value",
+      "type": "text",
+      "value": ""
     },
     {
       "name": "COD_workflow_version",
