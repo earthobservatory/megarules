@@ -90,12 +90,16 @@ def get_AOI(AOI_name):
     return r
 
 def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_time, end_time, coordinates):
+    with open('_context.json') as f:
+      ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
     query_temp = Template( query_file.read())
     condition = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
     condition = json.dumps(condition)
     job_name = "acquisition_localizer_multi_{}".format(AOI_name)
-    job_params = {}
+    job_params = {'asf_ngap_download_queue':'spyddder-sling-extract-asf',
+                  'esa_download_queue': 'factotum-job_worker-scihub_throttled',
+                  'spyddder_sling_extract_version':ctx['SLC_spyddder_sling_extract_version']}
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
     submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
@@ -215,7 +219,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         acq_scraper_job_query = rule_generation(open_ended, '"area_of_interest"', track_number, start_time, end_time, coordinates, passthrough)
     elif workflow.find("slcp2cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "aoi_name":AOI_name, "track_number": track_number, "overriding_azimuth_looks": overriding_azimuth_looks, "overriding_range_looks": overriding_range_looks, "minmatch": minmatch, "min_overlap": min_overlap}
+        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "aoi_name":AOI_name, "track_number": track_number, "overriding_azimuth_looks": overriding_azimuth_looks, "overriding_range_looks": overriding_range_looks, "minmatch": str(minmatch), "min_overlap": str(min_overlap)}
     elif workflow.find("cod2dpm") != -1:
         event_rule = rule_generation(open_ended, '"S1-COD"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"include": include, "exclude": exclude, "event_name": AOI_name, "dpmraw": dpmraw, "dpm": dpm_v1, "thr_cod": thr_cod, "gamma": gamma, "thr_alpha": thr_alpha, "band1": band1, "band4": band4, "yellow_to_red": yellow_to_red, "blues": blues, "merge": merge, "rmburst": rmburst, "kml": kml, "kml_url": kml_url}

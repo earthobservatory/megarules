@@ -84,6 +84,10 @@
       "destination": "context"
     },
     {
+      "name": "SLC_spyddder_sling_extract_version",
+      "destination": "context"
+    },
+    {
       "name": "SLCP_workflow_version",
       "destination": "context"
     },

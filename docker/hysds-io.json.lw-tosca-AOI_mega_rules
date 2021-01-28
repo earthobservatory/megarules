@@ -122,6 +122,14 @@
       "placeholder": "slc job version"
     },
     {
+      "name": "SLC_spyddder_sling_extract_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "default": "develop",
+      "version_regex": "job-spyddder-sling-extract",
+      "placeholder": "spyddder sling extract version"
+    },
+    {
       "name": "SLCP_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
@@ -137,9 +145,10 @@
     },
     {
       "name": "IFG_workflow_version",
-      "from": "value",
-      "type": "text",
-      "value": ""
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-sciflo-s1-ifg",
+      "placeholder": "ifg job version",
     },
     {
       "name": "COD_workflow_version",
@@ -302,7 +311,7 @@
     {
       "name": "thr_cod",
       "from": "submitter",
-      "type": "number",
+      "type": "text",
       "placeholder": "threshold for COD value from 0.4 to 0.7 (higher values -> lesser pixels)",
       "default": "0.45"
     },
