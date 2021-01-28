@@ -148,7 +148,7 @@
       "from": "submitter",
       "type": "jobspec_version",
       "version_regex": "job-sciflo-s1-ifg",
-      "placeholder": "ifg job version",
+      "placeholder": "ifg job version"
     },
     {
       "name": "COD_workflow_version",
