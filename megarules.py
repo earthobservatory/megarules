@@ -89,17 +89,44 @@ def get_AOI(AOI_name):
     r = requests.post('%s/%s/_search?' % (es_url, index), json.dumps(query_string))
     return r
 
+def query_es(query, es_index):
+    """Query ES."""
+
+    es_url = app.conf.GRQ_ES_URL
+    rest_url = es_url[:-1] if es_url.endswith('/') else es_url
+    url = "{}/{}/_search?search_type=scan&scroll=60&size=100".format(rest_url, es_index)
+    #logger.info("url: {}".format(url))
+    r = requests.post(url, data=json.dumps(query))
+    #r.raise_for_status()
+    scan_result = r.json()
+    #logger.info("scan_result: {}".format(json.dumps(scan_result, indent=2)))
+    count = scan_result['hits']['total']
+    scroll_id = scan_result['_scroll_id']
+    hits = []
+    while True:
+        r = requests.post('%s/_search/scroll?scroll=60m' % rest_url, data=scroll_id)
+        res = r.json()
+        scroll_id = res['_scroll_id']
+        if len(res['hits']['hits']) == 0: break
+        hits.extend(res['hits']['hits'])
+    return hits
+
+
 def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_time, end_time, coordinates):
     with open('_context.json') as f:
       ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
     query_temp = Template( query_file.read())
-    condition = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
-    condition = json.dumps(condition)
+    query = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
+    condition = json.dumps(query)
+    #get the acquisition list for 'products' based on the condition query
+    es_index = "grq_*_*acquisition*"
+    products = [i['fields']['partial'][0]['id']for i in query_es(query, es_index)]
     job_name = "acquisition_localizer_multi_{}".format(AOI_name)
     job_params = {'asf_ngap_download_queue':'spyddder-sling-extract-asf',
                   'esa_download_queue': 'factotum-job_worker-scihub_throttled',
-                  'spyddder_sling_extract_version':ctx['SLC_spyddder_sling_extract_version']}
+                  'spyddder_sling_extract_version':ctx['SLC_spyddder_sling_extract_version'],
+                  'products':products}
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
     submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
 
