@@ -89,12 +89,12 @@ def get_AOI(AOI_name):
     r = requests.post('%s/%s/_search?' % (es_url, index), json.dumps(query_string))
     return r
 
-def query_es(query, es_index):
+def query_es(query):
     """Query ES."""
 
     es_url = app.conf.GRQ_ES_URL
     rest_url = es_url[:-1] if es_url.endswith('/') else es_url
-    url = "{}/{}/_search?search_type=scan&scroll=60&size=100".format(rest_url, es_index)
+    url = "{}/_search?search_type=scan&scroll=60&size=100".format(rest_url)
     #logger.info("url: {}".format(url))
     r = requests.post(url, data=json.dumps(query))
     #r.raise_for_status()
@@ -117,18 +117,17 @@ def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_ti
       ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
     query_temp = Template( query_file.read())
-    query = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
-    condition = json.dumps(query)
+    condition_str = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
+    condition_dict = json.loads(condition_str)
     #get the acquisition list for 'products' based on the condition query
-    es_index = "grq_*_*acquisition*"
-    products = [i['fields']['partial'][0]['id']for i in query_es(query, es_index)]
+    products = [i['fields']['partial'][0]['id']for i in query_es(condition_dict)]
     job_name = "acquisition_localizer_multi_{}".format(AOI_name)
     job_params = {'asf_ngap_download_queue':'spyddder-sling-extract-asf',
                   'esa_download_queue': 'factotum-job_worker-scihub_throttled',
                   'spyddder_sling_extract_version':ctx['SLC_spyddder_sling_extract_version'],
                   'products':products}
     dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
-    submit_jobs(job_name, job_type, release, job_params, json.dumps(condition), dataset_tag)
+    submit_jobs(job_name, job_type, release, job_params, condition_str, dataset_tag)
 
 def submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, job_type, release):
     job_name = "acq_submitter_{}".format(AOI_name)
