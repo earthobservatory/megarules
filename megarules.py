@@ -122,7 +122,7 @@ def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, sta
             }
         }
     }
-    products = [i['fields']['partial'][0]['id']for i in query_es(json.dumps(prod_query))]
+    products = [i['fields']['partial'][0]['id']for i in query_es(prod_query)]
     other_params.update({'products':products})
     # job submission for localizer for exisiting acqs
     submit_jobs(job_name, job_type, release, other_params, query_str, job_name)
