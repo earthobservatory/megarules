@@ -1,6 +1,5 @@
 {
-  "query": {
-    "filtered": {
+  "filtered": {
       "query": {
         "bool": {
           "must": [
