@@ -35,7 +35,11 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     job_params["query"] = {"query": json.loads(condition)}
     job = job_type[job_type.find("hysds-io-")+9:]
     params = {}
-    params["queue"] = "aria-job_worker-small"
+    if 'acq' in job_type:
+        # for acq submitter and acq localizer
+        params["queue"] = "factotum-job_worker-small"
+    else:
+        params["queue"] = "aria-job_worker-small"
     params["priority"] = "5"
     params["name"] = job_name
     params["tags"] = '["%s"]' % dataset_tag
@@ -90,7 +94,7 @@ def query_es(query):
     return hits
 
 
-def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, start_time, end_time, coordinates, projectName):
+def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, start_time, end_time, coordinates):
     with open('_context.json') as f:
       ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
@@ -111,7 +115,7 @@ def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, sta
     print("priority: {}".format(str(priority)))
     print("rule: {}".format(query_str))
     print("other params: {}".format(other_params))
-    add_user_rules.add_user_rule(projectName, job_name, workflow_name, priority, query_str, other_params)
+    add_user_rules.add_user_rule('factotum', job_name, workflow_name, priority, query_str, other_params)
     
     #get the acquisition list for 'products' based on the query for job_submission
     prod_query = {
@@ -332,7 +336,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                     submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates, projectName)
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
                 add_rule('', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', 4)
             if lar_rule:
                 add_rule('', False, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, '', dataset_tag, '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', 4)
@@ -359,7 +363,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                     submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates, projectName)
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
                 add_rule('event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
             if lar_rule:
                 event_rule = co_event_rule(passthrough, "S1-SLCP", track_number, event_time, coordinates)
@@ -384,7 +388,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                     submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates, projectName)
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
                 add_rule('', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '', '', 4)
             if lar_rule:
                 add_rule('', True, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, "", dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
@@ -411,7 +415,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, i
                     submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
                 if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates, projectName)
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
                 add_rule('pre-event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '', '', '', '', 7)
                 add_rule('post-event-', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
 
