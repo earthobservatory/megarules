@@ -114,7 +114,15 @@ def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, sta
     add_user_rules.add_user_rule(projectName, job_name, workflow_name, priority, query_str, other_params)
     
     #get the acquisition list for 'products' based on the query for job_submission
-    products = [i['fields']['partial'][0]['id']for i in query_es(query_dict)]
+    prod_query = {
+        "query": query_dict,
+        "partial_fields": {
+            "partial": {
+                "include": ["id"]
+            }
+        }
+    }
+    products = [i['fields']['partial'][0]['id']for i in query_es(json.dumps(prod_query))]
     other_params.update({'products':products})
     # job submission for localizer for exisiting acqs
     submit_jobs(job_name, job_type, release, other_params, query_str, job_name)
