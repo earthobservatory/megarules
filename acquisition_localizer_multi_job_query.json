@@ -7,7 +7,7 @@
                 "dataset.raw": "acquisition-S1-IW_SLC"
               }
             },
-            $track_number,
+            $track_number
             {
               "range": {
                 "starttime": {
