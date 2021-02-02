@@ -93,13 +93,31 @@ def query_es(query):
         hits.extend(res['hits']['hits'])
     return hits
 
+def get_track_condition_str(track_number, trackName='metadata.trackNumber'):
+    if track_number:
+        if "," in track_number:
+            tracks = track_number.split(",")
+            track_json = ''
+            track_condition = '{"bool": {"should": ['
+            for track in tracks:
+                track_json +=  '{"term": {"'+trackName +'": "'+track.strip()+'"}},'
+            track_condition += track_json[:-1]
+            track_condition += "]}},"
+        else:
+            track_condition = '{"term": {"'+trackName +'": "'+track_number+'"}},'
+    else:
+        track_condition = ''
+
+    return track_condition
+
 
 def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, start_time, end_time, coordinates):
     with open('_context.json') as f:
       ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
     query_temp = Template( query_file.read())
-    query_str = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
+    track_condition = get_track_condition_str(ctx['track_number'], trackName='metadata.track_number')
+    query_str = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"','track_number':track_condition , 'coordinates':json.dumps(coordinates)})
     query_dict = json.loads(query_str)
 
     # rule submission for localizer for new acqs
@@ -156,19 +174,7 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
     else:
         pass_str = ''
 
-    if track_number:
-        if "," in track_number:
-            tracks = track_number.split(",")
-            track_json = ''
-            track_condition = '{"bool": {"should": ['
-            for track in tracks:
-                track_json +=  '{"term": {"metadata.trackNumber": "'+track.strip()+'"}},'
-            track_condition += track_json[:-1]
-            track_condition += "]}},"
-        else:
-            track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
-    else:
-        track_condition = ''
+    track_condition = get_track_condition_str(track_number)
 
     if open_ended is False:
         if dataset_type == '"S1-COD"':
@@ -196,19 +202,7 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
     else:
             pass_str = ''
 
-    if track_number:
-        if "," in track_number:
-            tracks = track_number.split(",")
-            track_json = ''
-            track_condition = '{"bool": {"should": ['
-            for track in tracks:
-                track_json +=  '{"term": {"metadata.trackNumber": "'+track.strip()+'"}},'
-            track_condition += track_json[:-1]
-            track_condition += "]}},"
-        else:
-            track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
-    else:
-        track_condition = ''
+    track_condition = get_track_condition_str(track_number)
 
     co_seismic_rule = open(os.path.join(BASE_PATH, 'co_event_condition.json'))
     rule_temp = Template( co_seismic_rule.read())
