@@ -252,7 +252,7 @@
       "optional": true,
       "lambda": "lambda x: int(x)",
       "placeholder": "(optional) azimuth looks to override SLCP",
-      "default": "2",
+      "default": "2"
     },
     {
       "name": "cod_overriding_range_looks",
