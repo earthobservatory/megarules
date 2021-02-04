@@ -120,11 +120,11 @@
       "destination": "context"
     },
     {
-      "name": "range_looks",
+      "name": "ifg_range_looks",
       "destination": "context"
     },
     {
-      "name": "azimuth_looks",
+      "name": "ifg_azimuth_looks",
       "destination": "context"
     },
     {
@@ -148,19 +148,27 @@
       "destination": "positional"
     },
     {
-      "name": "overriding_azimuth_looks",
+      "name": "lar_range_looks",
       "destination": "context"
     },
     {
-      "name": "overriding_range_looks",
+      "name": "lar_azimuth_looks",
       "destination": "context"
     },
     {
-      "name": "minmatch",
+      "name": "cod_overriding_azimuth_looks",
       "destination": "context"
     },
     {
-      "name": "min_overlap",
+      "name": "cod_overriding_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "cod_minmatch",
+      "destination": "context"
+    },
+    {
+      "name": "cod_min_overlap",
       "destination": "context"
     },
     {
