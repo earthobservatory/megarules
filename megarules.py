@@ -499,17 +499,17 @@ if __name__ == "__main__":
     include = ctx['include']
     exclude = ctx['exclude']
     event_name = ctx['event_name']
-    dpmraw = ctx['dpmraw']
-    dpm_v1 = ctx['dpm']
+    dpmraw = str(ctx['dpmraw']).lower()
+    dpm_v1 = str(ctx['dpm']).lower()
     thr_cod = ctx['thr_cod']
     gamma = ctx['gamma']
     thr_alpha = ctx['thr_alpha']
-    band1 = ctx['band1']
-    band4 = ctx['band4']
-    yellow_to_red = ctx['yellow_to_red']
-    blues = ctx['blues']
-    merge = ctx['merge']
-    rmburst = ctx['rmburst']
+    band1 =str(ctx['band1']).lower()
+    band4 = str(ctx['band4']).lower()
+    yellow_to_red = str(ctx['yellow_to_red']).lower()
+    blues = str(ctx['blues']).lower()
+    merge = str(ctx['merge']).lower()
+    rmburst = str(ctx['rmburst']).lower()
     kml = ctx['kml']
     kml_url = ctx['kml_url']
 
