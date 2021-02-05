@@ -26,28 +26,6 @@ user_name = None
 name = None
 BASE_PATH = os.path.dirname(__file__)
 
-def email_to_user(emails, project_name, rule_names, rules_info):
-    logger.debug("New rule(s) triggered. \nNeed to send email to admin")
-    print ("New rule(s) triggered. \nNeed to send email to admin")
-    attachments = None
-    if emails != '':
-       to_recipients = [i.strip() for i in emails.split(',')]
-    else:
-       to_recipients = ''
-
-    bcc_recipients = ''
-    subject = "[Rule Added] (%s)" % (project_name)
-
-    body = "Hi,\n"
-    body += "New trigger rules have been added using the 'Add trigger rules' action. To see the parameters and conditions for each rule created, please check 'My Rules' in the Aria Search interface.\n"
-    body += "\nFor project: "+project_name+"\n"
-    body += "Rule names: "+",".join([str(i) for i in rule_names])+"\n"
-    body += rules_info
-    body += "If you have any questions, please email aria-help@jpl.nasa.gov\n"
-    body += "Thanks,\n Aria"
-    notify_by_email.send_email("noreply-hysds@jpl.nasa.gov", to_recipients, bcc_recipients, subject, body, attachments=attachments)
-    logger.info("Email sent to %s",emails)
-    print ("Email sent to {}".format(emails))
 
 def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag):
     # submit mozart job
@@ -57,7 +35,11 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
     job_params["query"] = {"query": json.loads(condition)}
     job = job_type[job_type.find("hysds-io-")+9:]
     params = {}
-    params["queue"] = "aria-job_worker-small"
+    if 'acq' in job_type:
+        # for acq submitter and acq localizer
+        params["queue"] = "factotum-job_worker-small"
+    else:
+        params["queue"] = "aria-job_worker-small"
     params["priority"] = "5"
     params["name"] = job_name
     params["tags"] = '["%s"]' % dataset_tag
@@ -71,7 +53,7 @@ def submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
         r.raise_for_status()
     result = r.json()
     if 'result' in list(result.keys()) and 'success' in list(result.keys()):
-        if result['success'] == True:
+        if result['success']:
             job_id = result['result']
             print('submitted create_aoi:{} job: {} job_id: {}'.format(release, job, job_id))
         else:
@@ -89,19 +71,93 @@ def get_AOI(AOI_name):
     r = requests.post('%s/%s/_search?' % (es_url, index), json.dumps(query_string))
     return r
 
-def submit_acquisition_localizer_multi_job(AOI_name, job_type, release, start_time, end_time, coordinates):
+def query_es(query):
+    """Query ES."""
+
+    es_url = app.conf.GRQ_ES_URL
+    rest_url = es_url[:-1] if es_url.endswith('/') else es_url
+    url = "{}/_search?search_type=scan&scroll=60&size=100".format(rest_url)
+    #logger.info("url: {}".format(url))
+    r = requests.post(url, data=json.dumps(query))
+    #r.raise_for_status()
+    scan_result = r.json()
+    #logger.info("scan_result: {}".format(json.dumps(scan_result, indent=2)))
+    count = scan_result['hits']['total']
+    scroll_id = scan_result['_scroll_id']
+    hits = []
+    while True:
+        r = requests.post('%s/_search/scroll?scroll=60m' % rest_url, data=scroll_id)
+        res = r.json()
+        scroll_id = res['_scroll_id']
+        if len(res['hits']['hits']) == 0: break
+        hits.extend(res['hits']['hits'])
+    return hits
+
+def get_track_condition_str(track_number, trackName='metadata.trackNumber'):
+    if track_number:
+        if "," in track_number:
+            tracks = track_number.split(",")
+            track_json = ''
+            track_condition = '{"bool": {"should": ['
+            for track in tracks:
+                track_json +=  '{"term": {"'+trackName +'": "'+track.strip()+'"}},'
+            track_condition += track_json[:-1]
+            track_condition += "]}},"
+        else:
+            track_condition = '{"term": {"'+trackName +'": "'+track_number+'"}},'
+    else:
+        track_condition = ''
+
+    return track_condition
+
+
+def submit_acquisition_localizer_multi_job_rule(AOI_name, job_type, release, start_time, end_time, coordinates):
+    with open('_context.json') as f:
+      ctx = json.load(f)
     query_file = open(os.path.join(BASE_PATH, 'acquisition_localizer_multi_job_query.json'))
     query_temp = Template( query_file.read())
-    condition = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"', 'coordinates':json.dumps(coordinates)})
-    condition = json.dumps(condition)
-    job_name = "acquisition_localizer_multi_{}".format(AOI_name)
-    job_params = {}
-    dataset_tag = "acquisition_localizer_multi_{}".format(AOI_name)
-    submit_jobs(job_name, job_type, release, job_params, condition, dataset_tag)
+    track_condition = get_track_condition_str(ctx['track_number'], trackName='metadata.track_number')
+    query_str = query_temp.substitute({'start_time':'"'+start_time+'"','end_time':'"'+end_time+'"','track_number':track_condition , 'coordinates':json.dumps(coordinates)})
+    query_dict = json.loads(query_str)
 
-def submit_acq_submitter_job(AOI_name, job_type, release):
+    # rule submission for localizer for new acqs
+    job_name = "acquisition_localizer_multi_{}".format(AOI_name)
+    workflow_name = job_type+":"+release
+    other_params = {'asf_ngap_download_queue':'spyddder-sling-extract-asf',
+                  'esa_download_queue': 'factotum-job_worker-scihub_throttled',
+                  'spyddder_sling_extract_version':ctx['SLC_spyddder_sling_extract_version']}
+    priority = 7
+    print("Going to add rule for {}".format(job_type))
+    print("Rule names: {}".format(job_name))
+    print("workflows: {}".format(workflow_name))
+    print("priority: {}".format(str(priority)))
+    print("rule: {}".format(query_str))
+    print("other params: {}".format(other_params))
+    add_user_rules.add_user_rule('factotum', job_name, workflow_name, priority, query_str, other_params)
+    
+    #get the acquisition list for 'products' based on the query for job_submission
+    prod_query = {
+        "query": query_dict,
+        "partial_fields": {
+            "partial": {
+                "include": ["id"]
+            }
+        }
+    }
+    products = [i['fields']['partial'][0]['id']for i in query_es(prod_query)]
+    other_params.update({'products':products})
+    # job submission for localizer for exisiting acqs
+    submit_jobs(job_name, job_type, release, other_params, query_str, job_name)
+
+
+
+def submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, job_type, release):
     job_name = "acq_submitter_{}".format(AOI_name)
-    job_params = {}
+    job_params = {"AOI_name": AOI_name,
+                  "spatial_extent":coordinates,
+                  "start_time":start_time,
+                  "end_time":end_time,
+                  "dataset_version":'v2.0'}
     dataset_tag = "acq_submitter_{}".format(AOI_name)
     condition = {"query":{"bool": {"must": [{"term": {"dataset_type.raw": "area_of_interest"}},{"query_string": {"query": '_id:"AOI"',"default_operator": "OR"}}]}}}
     condition["query"]["bool"]["must"][1]["query_string"]["query"] = '_id:"'+AOI_name+'"'
@@ -118,19 +174,7 @@ def rule_generation(open_ended, dataset_type, track_number, start_time, end_time
     else:
         pass_str = ''
 
-    if track_number:
-        if "," in track_number:
-            tracks = track_number.split(",")
-            track_json = ''
-            track_condition = '{"bool": {"should": ['
-            for track in tracks:
-                track_json +=  '{"term": {"metadata.trackNumber": "'+track.strip()+'"}},'
-            track_condition += track_json[:-1]
-            track_condition += "]}},"
-        else:
-            track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
-    else:
-        track_condition = ''
+    track_condition = get_track_condition_str(track_number)
 
     if open_ended is False:
         if dataset_type == '"S1-COD"':
@@ -158,19 +202,7 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
     else:
             pass_str = ''
 
-    if track_number:
-        if "," in track_number:
-            tracks = track_number.split(",")
-            track_json = ''
-            track_condition = '{"bool": {"should": ['
-            for track in tracks:
-                track_json +=  '{"term": {"metadata.trackNumber": "'+track.strip()+'"}},'
-            track_condition += track_json[:-1]
-            track_condition += "]}},"
-        else:
-            track_condition = '{"term": {"metadata.trackNumber": "'+track_number+'"}},'
-    else:
-        track_condition = ''
+    track_condition = get_track_condition_str(track_number)
 
     co_seismic_rule = open(os.path.join(BASE_PATH, 'co_event_condition.json'))
     rule_temp = Template( co_seismic_rule.read())
@@ -183,8 +215,12 @@ def co_event_rule(passthrough, dataset_type, track_number, event_time, coordinat
     print(co_seismic_query)
     return co_seismic_query
 
-def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, overriding_azimuth_looks, overriding_range_looks, minmatch, min_overlap, include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, priority):
-    rules_info = ''
+def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version,
+             projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag,
+             cod_overriding_azimuth_looks, cod_overriding_range_looks, minmatch, min_overlap,
+             include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url,
+             priority):
+    # rules_info = ''
     workflow_name = workflow+":"+workflow_version
     #mode can be pre-event-, post-event-, event- or ''(in the case of monitoring)
     # open_ended would be boolean value
@@ -208,14 +244,13 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params = {}
     elif workflow.endswith("ifg"):
         event_rule = rule_generation(open_ended, '"S1-IW_SLC"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"dataset_tag":dataset_tag,"project":projectName , "singlesceneOnly": "true", "preReferencePairDirection": "backward", "postReferencePairDirection": "forward", "temporalBaseline":temporal_baseline,"minMatch":minMatch, "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks, "covth":coverage_threshold, "precise_orbit_only":"false"}
+        other_params = {"dataset_tag":dataset_tag,"project":projectName , "singlesceneOnly": "true", "preReferencePairDirection": "backward", "postReferencePairDirection": "forward", "temporalBaseline":temporal_baseline,"minMatch":minMatch, "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks, "covth":coverage_threshold, "precise_orbit_only": "false"}
     elif workflow.endswith("slcp-mrpe"):
         event_rule = rule_generation(open_ended, '"S1-IW_SLC"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"event_time":event_time, "start_time":start_time, "end_time":end_time, "dataset_tag":dataset_tag, "project":projectName, "singlesceneOnly": "true", "temporalBaseline":temporal_baseline, "minMatch":minMatch, "covth":coverage_threshold, "precise_orbit_only":"false", "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks}
-        acq_scraper_job_query = rule_generation(open_ended, '"area_of_interest"', track_number, start_time, end_time, coordinates, passthrough)
     elif workflow.find("slcp2cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
-        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "aoi_name":AOI_name, "track_number": track_number, "overriding_azimuth_looks": overriding_azimuth_looks, "overriding_range_looks": overriding_range_looks, "minmatch": minmatch, "min_overlap": min_overlap}
+        other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "aoi_name":AOI_name, "track_number": track_number, "overriding_azimuth_looks": cod_overriding_azimuth_looks, "overriding_range_looks": cod_overriding_range_looks, "minmatch": str(int(minmatch)), "min_overlap": str(min_overlap)}
     elif workflow.find("cod2dpm") != -1:
         event_rule = rule_generation(open_ended, '"S1-COD"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"include": include, "exclude": exclude, "event_name": AOI_name, "dpmraw": dpmraw, "dpm": dpm_v1, "thr_cod": thr_cod, "gamma": gamma, "thr_alpha": thr_alpha, "band1": band1, "band4": band4, "yellow_to_red": yellow_to_red, "blues": blues, "merge": merge, "rmburst": rmburst, "kml": kml, "kml_url": kml_url}
@@ -234,12 +269,12 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
     print("rule: {}".format(event_rule))
     print("other params: {}".format(other_params))
 
-    rules_info = "Added {} rule \n".format(mode)
-    rules_info += "Rule name: {}\n".format(rule_name)
-    rules_info += "workflow: {}\n".format(workflow_name)
-    rules_info += "priority: {}\n".format(str(priority))
-    #rules_info += "event_rule: %s"% event_rule+"\n"
-    #rules_info += "other params: %s"% other_params+'\n'
+    # rules_info = "Added {} rule \n".format(mode)
+    # "Rule name: {}\n".format(rule_name)
+    # "workflow: {}\n".format(workflow_name)
+    # "priority: {}\n".format(str(priority))
+    #"event_rule: %s"% event_rule+"\n"
+    #"other params: %s"% other_params+'\n'
 
     add_user_rules.add_user_rule(projectName, rule_name, workflow_name, priority, event_rule, other_params)
     logger.debug("{} rule added".format(mode))
@@ -256,26 +291,16 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         #add on-demand job for S1-SLCs already in the system
         submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
 
-    return rules_info
+    # return rules_info
 
-def add_co_event_lar(event_rule, projectName, AOI_name, workflow, workflow_version, priority):
+def add_co_event_lar(event_rule, projectName, AOI_name, workflow, workflow_version, lar_range_looks, lar_azimuth_looks, priority):
     #mode can be pre-event-, post-event- or ''(in the case of monitoring)
 
-    other_params = {}
+    other_params = {"lar_range_looks":lar_range_looks, "lar_azimuth_looks":lar_azimuth_looks}
     mode = "co-event-"
     workflow_name = workflow+":"+workflow_version
     rule_name = mode+'lar_'+AOI_name
-
-    logger.debug("Kicking off rules for response: {}".format(rule_name))
     print("Kicking off rules for response: {}".format(rule_name))
-
-    logger.debug("Going to add {} rule for {}".format(mode,workflow))
-    logger.debug("Rule names: {}".format(rule_name))
-    logger.debug("workflows: {}".format(workflow_name))
-    logger.debug("priority: {}".format(str(priority)))
-    logger.debug("rule: {}".format(event_rule))
-    logger.debug("other params: {}".format(other_params))
-
     print("Going to add {} rule for {}".format(mode,workflow))
     print("Rule names: {}".format(rule_name))
     print("workflows: {}".format(workflow_name))
@@ -283,239 +308,128 @@ def add_co_event_lar(event_rule, projectName, AOI_name, workflow, workflow_versi
     print("rule: {}".format(event_rule))
     print("other params: {}".format(other_params))
 
-    rules_info = "Added {} rule \n".format(mode)
-    rules_info += "Rule name: {}\n".format(rule_name)
-    rules_info += "workflow: {}\n".format(workflow_name)
-    rules_info += "priority: {}\n".format(str(priority))
-    #rules_info += "event_rule: %s"% event_rule+"\n"
-    #rules_info += "other params: %s"% other_params+'\n'
-
     add_user_rules.add_user_rule(projectName, rule_name, workflow_name, priority, event_rule, other_params)
     logger.debug("{} rule added".format(mode))
     print("{} rule added".format(mode))
-
-    return rules_info
-
-
-def add_email_rule(AOI_name, dataset, track_number, passthrough, event_time, coordinates, emails):
-
-    if dataset == "S1-SLCP":
-        product_type = "slcp"
-    elif dataset == "S1-IFG":
-        product_type = "ifg"
-    elif dataset == "S1-LAR":
-        product_type = "lar"
-    elif dataset == "S1-COD":
-        product_type = "cod"
-    elif dataset == "S1-DPM":
-        product_type = "dpm"
-
-    email_rule_set = co_event_rule(passthrough, dataset, track_number, event_time, json.dumps(coordinates))
-    other_params = {"emails": emails}
-
-    logger.debug("Going to add email notification rule for co-seismic products")
-    logger.debug("Rule name: %s", AOI_name+"-"+product_type+"_email")
-    logger.debug("workflow: %s", notify_by_email_io+":"+email_job_version)
-    logger.debug("priority: %s", '0')
-    logger.debug("email_rule_set: %s",email_rule_set)
-    logger.debug("other params: %s", other_params)
-    logger.debug("Event notification rule added")
-
-    rules_info = "Added email notification rule for co-seismic products\n"
-    rules_info += "Rule name: %s"%AOI_name+"-"+product_type+"_email"+'\n'
-    rules_info += "workflow: %s"% notify_by_email_io+":"+email_job_version+'\n'
-    rules_info += "priority: %s"% '0\n'
-    rules_info += "email notification rule: %s"%email_rule_set+"\n"
-    rules_info +="other params: %s"%other_params+'\n'
-
-    print("Going to add email notification rule for co-seismic products")
-    print("Rule name: %s", AOI_name+"-"+product_type+"_email")
-    print("workflow: %s", notify_by_email_io+":"+email_job_version)
-    print("priority: %s", '0')
-    print("email_rule_set: %s",email_rule_set)
-    print("other params: %s", other_params)
-    add_user_rules.add_user_rule(projectName, AOI_name+"-"+product_type+"_email", notify_by_email_io+":"+email_job_version, 0, email_rule_set, other_params)
-    logger.debug("Event notification rule added")
-    print("Event notification rule added")
-        
-    return rules_info
 
 def convert_datetime_for_slcp(date_time):
     time = parse(date_time)
     new_time = time.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]
     return new_time
 
-def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, ifg_rule, cod_rule, dpm_rule, acq_workflow, slc_workflow, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow, acq_workflow_version, slc_workflow_version, slcp_workflow_version, lar_workflow_version, ifg_workflow_version, cod_workflow_version, dpm_workflow_version, projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, overriding_azimuth_looks, overriding_range_looks, minmatch, min_overlap, include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, emails):
+def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_rule, lar_rule, ifg_rule, cod_rule, dpm_rule,
+               acq_workflow, slc_workflow, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow,
+               acq_workflow_version, slc_workflow_version, slcp_workflow_version, lar_workflow_version, ifg_workflow_version, cod_workflow_version, dpm_workflow_version,
+               projectName, start_time, end_time, event_time, temporal_baseline, track_number, passthrough, minMatch, ifg_range_looks, ifg_azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag,
+               lar_range_looks, lar_azimuth_looks,
+               cod_overriding_azimuth_looks, cod_overriding_range_looks, minmatch, min_overlap,
+               include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, emails):
 
-    rule_names = []
-    rules_info = ''
     #check if event time exists
     if end_time != '':
         if event_time == '':
             # event_time doesn't exist
             # set trigger rules from starttime and endtime of AOI
-            if ifg_rule == True:
-                rules_info += add_rule('', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['ifg_'+AOI_name])
-            if slcp_rule == True:
+            if ifg_rule:
+                add_rule('', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
+            if slcp_rule:
                 start_time = convert_datetime_for_slcp(start_time)
                 end_time = convert_datetime_for_slcp(end_time)
-                if acq_rule == True:
+                if acq_rule:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
-                if slc_rule == True:
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
+                if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
-                rules_info += add_rule('', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['slcp_'+AOI_name])
-            if lar_rule == True:
-                rules_info += add_rule('', False, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, '', dataset_tag, '', '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['lar_'+AOI_name])
-            if cod_rule == True:
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
+                add_rule('', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
+            if lar_rule:
+                add_rule('', False, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, '', dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
+            if cod_rule:
                 # if it's a not event the don't add cod rule
                 print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
-                #rules_info += add_rule('', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', 4)
-            if dpm_rule == True:
+            if dpm_rule:
                 # if it's a not event the don't add dpm rule
                 print("DPM rules are only added for events. So ignoreing DPM_processing set to true flag.")
         else:
             # add pre-event, post-event and co-event trigger rules
-            if ifg_rule == True:
+            if ifg_rule:
                 #add pre-event rule
-                rules_info += add_rule('pre-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, "", event_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', '', '', 7)
+                add_rule('pre-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, "", event_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
 
                 #add post-event rule
-                rules_info += add_rule('post-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, event_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(['pre-event-ifg_'+AOI_name, "post-event-ifg_"+AOI_name])
-                #add mail rule
-                rules_info += add_email_rule(AOI_name, "S1-IFG", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-ifg_email"])
-            if slcp_rule == True:
+                add_rule('post-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, event_time, "", end_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+            if slcp_rule:
                 start_time = convert_datetime_for_slcp(start_time)
                 event_time = convert_datetime_for_slcp(event_time)
                 end_time = convert_datetime_for_slcp(end_time)
-                if acq_rule == True:
+                if acq_rule:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
-                if slc_rule == True:
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
+                if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
-                rules_info += add_rule('event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(["event-slcp_"+AOI_name, "post-event-slcp_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-SLCP", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-slcp_email"])
-            if lar_rule == True:
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
+                add_rule('event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, event_time, end_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+            if lar_rule:
                 event_rule = co_event_rule(passthrough, "S1-SLCP", track_number, event_time, coordinates)
-                rules_info += add_co_event_lar(event_rule, projectName, AOI_name, lar_workflow, lar_workflow_version, 7)
-                rule_names.extend(["co-event-lar_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-LAR", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-lar_email"])
-            if cod_rule == True:
+                add_co_event_lar(event_rule, projectName, AOI_name, lar_workflow, lar_workflow_version, lar_range_looks, lar_azimuth_looks, 7)
+            if cod_rule:
                 # add event rule
-                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, overriding_azimuth_looks, overriding_range_looks, minmatch, min_overlap, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(['event-cod_'+AOI_name])
-                #add mail rule
-                rules_info += add_email_rule(AOI_name, "S1-COD", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-cod_email"])
-            if dpm_rule == True:
+                add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, cod_overriding_azimuth_looks, cod_overriding_range_looks, minmatch, min_overlap, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+            if dpm_rule:
                 # add event rule
-                rules_info += add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, '', '', '', '', include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, 7)
-                rule_names.extend(['event-dpm_'+AOI_name])
-                #add mail rule
-                rules_info += add_email_rule(AOI_name, "S1-DPM", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-dpm_email"])
+                add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, "", end_time, temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, '', '', '', '', include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, 7)
     else:
         logging.debug("Start time exists but no end time specified")
         if event_time == '':
             #only start time give
             logging.debug("Only start time available")
             if ifg_rule:
-                rules_info += add_rule('', True, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '','','', '', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['ifg_'+AOI_name])
+                add_rule('', True, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
             if slcp_rule:
                 start_time = convert_datetime_for_slcp(start_time)
-                if acq_rule == True:
+                if acq_rule:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
-                if slc_rule == True:
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
+                if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
-                rules_info += add_rule('', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['slcp_'+AOI_name])
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
+                add_rule('', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
             if lar_rule:
-                rules_info += add_rule('', True, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, "", dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
-                rule_names.extend(['lar_'+AOI_name])
+                add_rule('', True, AOI_name, coordinates, lar_workflow, lar_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, "", dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 4)
             if cod_rule:
                 #not adding COD because this is not an event
                 print("COD rules are only added for events. So ignoreing COD_processing set to true flag.")
-                #rule_names.extend(['cod_'+AOI_name])
             if dpm_rule:
                 #not adding DPM because this is not an event
                 print("DPM rules are only added for events. So ignoreing DPM_processing set to true flag.")
-                #rule_names.extend(['dpm_'+AOI_name])
         else:
             #start time and event time given
             logging.debug("Need to add a pre-event and post event needs to be added")
-            if ifg_rule == True:
+            if ifg_rule:
                 #add pre-event rule
-                rules_info += add_rule('pre-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+                add_rule('pre-event-', False, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
                 #add post-event rule
-                rules_info += add_rule('post-event-', True, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(['pre-event-ifg_'+AOI_name, "post-event-ifg_"+AOI_name])
-                #add mail rule
-                rules_info += add_email_rule(AOI_name, "S1-IFG", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-ifg_email"])
+                add_rule('post-event-', True, AOI_name, coordinates, ifg_workflow, ifg_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
 
-            if slcp_rule == True:
+            if slcp_rule:
                 start_time = convert_datetime_for_slcp(start_time)
                 event_time = convert_datetime_for_slcp(event_time)
-                if acq_rule == True:
+                if acq_rule:
                     # submit job to scrape acquisitions
-                    submit_acq_submitter_job(AOI_name, acq_workflow, acq_workflow_version)
-                if slc_rule == True:
+                    submit_acq_submitter_job(AOI_name, coordinates, start_time, end_time, acq_workflow, acq_workflow_version)
+                if slc_rule:
                     # submit job to scrape slcs based on AOI and acquisitons
-                    submit_acquisition_localizer_multi_job(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
-                rules_info += add_rule('pre-event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '','', '', '', '', '', '', '', '', '', '', 7)
+                    submit_acquisition_localizer_multi_job_rule(AOI_name, slc_workflow, slc_workflow_version, start_time, end_time, coordinates)
+                add_rule('pre-event-', False, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, start_time, '', event_time, temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+                add_rule('post-event-', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
 
-                rules_info += add_rule('post-event-', True, AOI_name, coordinates, slcp_workflow, slcp_workflow_version, projectName, event_time, '', '', temporal_baseline, track_number, passthrough, minMatch, azimuth_looks, filter_strength, dem_type, range_looks, coverage_threshold, dataset_tag, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(["pre-event-slcp_"+AOI_name, "post-event-slcp_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-SLCP", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-slcp_email"])
+            if lar_rule:
+                co_event_rule(passthrough, "S1-LAR", track_number, event_time, coordinates)
+            if cod_rule:
+                add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, cod_overriding_azimuth_looks, cod_overriding_range_looks, minmatch, min_overlap, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
+            if dpm_rule:
+                add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, '', '', '', '', include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, 7)
 
-            if lar_rule == True:
-                rules_info += co_event_rule(passthrough, "S1-LAR", track_number, event_time, coordinates)
-                rule_names.extend(["co-event-lar_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-LAR", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-lar_email"])
-
-            if cod_rule == True:
-                rules_info += add_rule('event-', False, AOI_name, coordinates, cod_workflow, cod_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, overriding_azimuth_looks, overriding_range_looks, minmatch, min_overlap, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 7)
-                rule_names.extend(["event-cod_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-COD", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-cod_email"])
-
-            if dpm_rule == True:
-                rules_info += add_rule('event-', False, AOI_name, coordinates, dpm_workflow, dpm_workflow_version, projectName, start_time, '', '', temporal_baseline, track_number, passthrough, '', '', '', '', '', '', dataset_tag, '', '', '', '', include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, 7)
-                rule_names.extend(["event-dpm_"+AOI_name])
-                #add email rule
-                rules_info += add_email_rule(AOI_name, "S1-DPM", track_number, passthrough, event_time, coordinates, emails)
-                rule_names.extend([AOI_name+"-dpm_email"])
-
-    #send out email to admin
-    # logger.debug("Sending email to admin with details of rules created")
-    # print("Sending email to admin with details of rules created")
-
-    # if emails != '':
-    #     email_to_user(emails, projectName, rule_names, rules_info)
-    #     logger.debug("Email sent to admin")
-    #     print("Email sent to admin")
-
-    #end of mega_rules
 
 if __name__ == "__main__":
     '''
@@ -558,8 +472,8 @@ if __name__ == "__main__":
     cod_version = ctx['COD_workflow_version']
     dpm_version = ctx['DPM_workflow_version']
 
-    azimuth_looks = ctx['azimuth_looks']
-    range_looks = ctx['range_looks']
+    ifg_azimuth_looks = ctx['ifg_azimuth_looks']
+    ifg_range_looks = ctx['ifg_range_looks']
     filter_strength = ctx["filter_strength"]
     dem_type = ctx["dem_type"]
     emails = "" # disabled emails
@@ -570,27 +484,32 @@ if __name__ == "__main__":
     temporal_baseline = ctx['temporal_baseline']
     minMatch = ctx['minimum_pair']
 
+    # parameters for slcp2lar
+    lar_range_looks = ctx['lar_range_looks']
+    lar_azimuth_looks = ctx['ifg_azimuth_looks']
+
     # parameters for slcp2cod
-    overriding_azimuth_looks = ctx['overriding_azimuth_looks']
-    overriding_range_looks = ctx['overriding_range_looks']
-    minmatch = ctx['minmatch']
-    min_overlap = ctx['min_overlap']
+    cod_overriding_azimuth_looks = ctx['cod_overriding_azimuth_looks']
+    cod_overriding_range_looks = ctx['cod_overriding_range_looks']
+    minmatch = ctx['cod_minmatch']
+    min_overlap = ctx['cod_min_overlap']
+
 
     #parameters for cod2dpm
     include = ctx['include']
     exclude = ctx['exclude']
     event_name = ctx['event_name']
-    dpmraw = ctx['dpmraw']
-    dpm_v1 = ctx['dpm']
+    dpmraw = str(ctx['dpmraw']).lower()
+    dpm_v1 = str(ctx['dpm']).lower()
     thr_cod = ctx['thr_cod']
     gamma = ctx['gamma']
     thr_alpha = ctx['thr_alpha']
-    band1 = ctx['band1']
-    band4 = ctx['band4']
-    yellow_to_red = ctx['yellow_to_red']
-    blues = ctx['blues']
-    merge = ctx['merge']
-    rmburst = ctx['rmburst']
+    band1 =str(ctx['band1']).lower()
+    band4 = str(ctx['band4']).lower()
+    yellow_to_red = str(ctx['yellow_to_red']).lower()
+    blues = str(ctx['blues']).lower()
+    merge = str(ctx['merge']).lower()
+    rmburst = str(ctx['rmburst']).lower()
     kml = ctx['kml']
     kml_url = ctx['kml_url']
 
@@ -616,4 +535,10 @@ if __name__ == "__main__":
     else:
         eventtime = result["hits"]["hits"][0]["_source"]["metadata"]["eventtime"]
 
-    mega_rules(AOI_name, coordinates, acq, slc, slcp, lar, ifg, cod, dpm, acq_workflow, slc_workflow, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow, acq_version, slc_version, slcp_version, lar_version, ifg_version, cod_version, dpm_version, projectName, starttime, endtime, eventtime, temporal_baseline, track_number, passthrough, minMatch, range_looks, azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag, overriding_azimuth_looks, overriding_range_looks, minmatch, min_overlap, include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, emails)
+    mega_rules(AOI_name, coordinates, acq, slc, slcp, lar, ifg, cod, dpm,
+               acq_workflow, slc_workflow, slcp_workflow, lar_workflow, ifg_workflow, cod_workflow, dpm_workflow,
+               acq_version, slc_version, slcp_version, lar_version, ifg_version, cod_version, dpm_version,
+               projectName, starttime, endtime, eventtime, temporal_baseline, track_number, passthrough, minMatch, ifg_range_looks, ifg_azimuth_looks, filter_strength, dem_type, coverage_threshold, dataset_tag,
+               lar_range_looks, lar_azimuth_looks,
+               cod_overriding_azimuth_looks, cod_overriding_range_looks, minmatch, min_overlap,
+               include, exclude, event_name, dpmraw, dpm_v1, thr_cod, gamma, thr_alpha, band1, band4, yellow_to_red, blues, merge, rmburst, kml, kml_url, emails)

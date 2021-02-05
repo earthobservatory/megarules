@@ -22,15 +22,6 @@
       "placeholder": "name of Area of Interest"
     },
     {
-      "name": "AOI_type",
-      "from": "submitter",
-      "type": "enum",
-      "enumerables": [
-        "monitoring",
-        "urgent_response"
-      ]
-    },
-    {
       "name": "acquisitions_scraper_processing",
       "from": "submitter",
       "type": "boolean"
@@ -122,6 +113,14 @@
       "placeholder": "slc job version"
     },
     {
+      "name": "SLC_spyddder_sling_extract_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "default": "develop",
+      "version_regex": "job-spyddder-sling-extract",
+      "placeholder": "spyddder sling extract version"
+    },
+    {
       "name": "SLCP_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
@@ -183,7 +182,7 @@
       "default": "1"
     },
     {
-      "name": "range_looks",
+      "name": "ifg_range_looks",
       "from": "submitter",
       "type": "number",
       "placeholder": "input for IFG",
@@ -191,7 +190,7 @@
       "default": "7"
     },
     {
-      "name": "azimuth_looks",
+      "name": "ifg_azimuth_looks",
       "from": "submitter",
       "type": "number",
       "placeholder": "input for IFG",
@@ -238,7 +237,25 @@
       "default": "v1.2"
     },
     {
-      "name": "overriding_range_looks",
+      "name": "lar_range_looks",
+      "from": "submitter",
+      "type": "number",
+      "optional": true,
+      "lambda": "lambda x: int(x)",
+      "placeholder": "(optional) range looks to override SLCP",
+      "default": "7"
+    },
+    {
+      "name": "lar_azimuth_looks",
+      "from": "submitter",
+      "type": "number",
+      "optional": true,
+      "lambda": "lambda x: int(x)",
+      "placeholder": "(optional) azimuth looks to override SLCP",
+      "default": "2"
+    },
+    {
+      "name": "cod_overriding_range_looks",
       "from": "submitter",
       "type": "text",
       "optional": true,
@@ -246,7 +263,7 @@
       "placeholder": "(optional) comma sep. looks across subswaths e.g. 7,8,9"
     },
     {
-      "name": "overriding_azimuth_looks",
+      "name": "cod_overriding_azimuth_looks",
       "from": "submitter",
       "type": "text",
       "optional": true,
@@ -254,14 +271,14 @@
       "placeholder": "(optional) comma sep. looks across subswaths e.g. 2,2,2"
     },
     {
-      "name": "minmatch",
+      "name": "cod_minmatch",
       "from": "submitter",
       "type": "number",
       "optional": true,
       "default": "1"
     },
     {
-      "name": "min_overlap",
+      "name": "cod_min_overlap",
       "from": "submitter",
       "type": "number",
       "optional": true,
@@ -303,7 +320,7 @@
     {
       "name": "thr_cod",
       "from": "submitter",
-      "type": "number",
+      "type": "text",
       "placeholder": "threshold for COD value from 0.4 to 0.7 (higher values -> lesser pixels)",
       "default": "0.45"
     },

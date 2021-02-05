@@ -16,10 +16,6 @@
       "destination": "context"
     },
     {
-      "name": "AOI_type",
-      "destination": "context"
-    },
-    {
       "name": "acquisitions_scraper_processing",
       "destination": "context"
     },
@@ -84,6 +80,10 @@
       "destination": "context"
     },
     {
+      "name": "SLC_spyddder_sling_extract_version",
+      "destination": "context"
+    },
+    {
       "name": "SLCP_workflow_version",
       "destination": "context"
     },
@@ -120,11 +120,11 @@
       "destination": "context"
     },
     {
-      "name": "range_looks",
+      "name": "ifg_range_looks",
       "destination": "context"
     },
     {
-      "name": "azimuth_looks",
+      "name": "ifg_azimuth_looks",
       "destination": "context"
     },
     {
@@ -148,19 +148,27 @@
       "destination": "positional"
     },
     {
-      "name": "overriding_azimuth_looks",
+      "name": "lar_range_looks",
       "destination": "context"
     },
     {
-      "name": "overriding_range_looks",
+      "name": "lar_azimuth_looks",
       "destination": "context"
     },
     {
-      "name": "minmatch",
+      "name": "cod_overriding_azimuth_looks",
       "destination": "context"
     },
     {
-      "name": "min_overlap",
+      "name": "cod_overriding_range_looks",
+      "destination": "context"
+    },
+    {
+      "name": "cod_minmatch",
+      "destination": "context"
+    },
+    {
+      "name": "cod_min_overlap",
       "destination": "context"
     },
     {
