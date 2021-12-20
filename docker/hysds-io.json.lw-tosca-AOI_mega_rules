@@ -167,7 +167,7 @@
       "type": "number",
       "from": "submitter",
       "placeholder": "number of days to look back for product pairs",
-      "default": "12"
+      "default": "18"
     },
     {
       "name": "query",
@@ -275,7 +275,7 @@
       "from": "submitter",
       "type": "number",
       "optional": true,
-      "default": "1"
+      "default": "2"
     },
     {
       "name": "cod_min_overlap",
