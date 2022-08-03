@@ -124,7 +124,7 @@
       "type": "number",
       "placeholder": "input for IFG",
       "optional": true,
-      "default": "7"
+      "default": "33"
     },
     {
       "name": "azimuth_looks",
@@ -132,7 +132,7 @@
       "type": "number",
       "placeholder": "input for IFG",
       "optional": true,
-      "default": "3"
+      "default": "11"
     },
     {
       "name": "filter_strength",
