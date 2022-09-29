@@ -21,10 +21,8 @@ user_name = None
 
 def create_user_rules_index(es_url, es_index):
     """Create user rules index applying percolator mapping."""
-
     # create index with percolator mapping
-    mapping_file = os.path.normpath(os.path.join(
-        app.root_path, 'configs',
+    mapping_file = os.path.normpath(os.path.join( os.path.dirname(os.path.realpath(__file__)), 'configs',
         'user_rules_dataset.mapping'))
     with open(mapping_file) as f:
         mapping = f.read()
