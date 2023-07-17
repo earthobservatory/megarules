@@ -92,7 +92,11 @@
       "destination": "context"
     },
     {
-      "name": "SLCP_workflow_version",
+      "name": "SLCP_mrpe_workflow_version",
+      "destination": "context"
+    },
+        {
+      "name": "SLCP_custom_workflow_version",
       "destination": "context"
     },
     {
