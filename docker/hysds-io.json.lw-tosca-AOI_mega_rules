@@ -245,6 +245,7 @@
       "name": "dataset_tag",
       "from": "submitter",
       "type": "text",
+      "default": "standard",
       "placeholder": "user tag for data products",
       "optional": true
     },
@@ -259,14 +260,14 @@
       "from": "submitter",
       "type": "text",
       "optional": true,
-      "placeholder": "YYYYMMDD ref/master date for custom slcp"
+      "placeholder": "(optional) YYYYMMDD ref/master date for custom slcp"
     },
     {
       "name": "slcp_custom_sec_date",
       "from": "submitter",
       "type": "text",
       "optional": true,
-      "placeholder": "YYYYMMDD secondary date for custom slcp "
+      "placeholder": "(optional) YYYYMMDD sec/slave date for custom slcp "
     },
     {
       "name": "lar_range_looks",
@@ -335,6 +336,7 @@
       "name": "event_name",
       "from": "submitter",
       "type": "text",
+      "optional": true,
       "placeholder": "EOS_ARIA-SG_DPM_YYYYMMDD_EventArea"
     },
     {
