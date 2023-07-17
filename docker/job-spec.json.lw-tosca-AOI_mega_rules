@@ -152,6 +152,14 @@
       "destination": "context"
     },
     {
+      "name": "slcp_custom_ref_date",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_custom_sec_date",
+      "destination": "context"
+    },
+    {
       "name": "slcp_version",
       "destination": "positional"
     },

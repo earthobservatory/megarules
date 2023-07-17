@@ -172,7 +172,6 @@
       "type": "jobspec_version",
       "version_regex": "job-cod2dpm",
       "placeholder": "dpm job version"
-      "placeholder": "dpm job version"
     },
     {
       "name": "track_number",
@@ -254,6 +253,20 @@
       "from": "submitter",
       "type": "text",
       "default": "v1.2"
+    },
+  {
+      "name": "slcp_custom_ref_date",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "placeholder": "YYYYMMDD ref/master date for custom slcp"
+    },
+    {
+      "name": "slcp_custom_sec_date",
+      "from": "submitter",
+      "type": "text",
+      "optional": true,
+      "placeholder": "YYYYMMDD secondary date for custom slcp "
     },
     {
       "name": "lar_range_looks",
