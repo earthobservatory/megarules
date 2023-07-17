@@ -37,7 +37,12 @@
       "type": "boolean"
     },
     {
-      "name": "SLCP_processing",
+      "name": "SLCP_mrpe_processing",
+      "from": "submitter",
+      "type": "boolean"
+    },
+    {
+      "name": "SLCP_custom_processing",
       "from": "submitter",
       "type": "boolean"
     },
@@ -75,10 +80,16 @@
       "value": "hysds-io-sciflo-s1-ifg"
     },
     {
-      "name": "slcp_workflow",
+      "name": "slcp_mrpe_workflow",
       "from": "value",
       "type": "text",
       "value": "hysds-io-sciflo-s1-slcp-mrpe"
+    },
+    {
+      "name": "slcp_custom_workflow",
+      "from": "value",
+      "type": "text",
+      "value": "hysds-io-slcp-custom"
     },
     {
       "name": "lar_workflow",
@@ -121,11 +132,18 @@
       "placeholder": "spyddder sling extract version"
     },
     {
-      "name": "SLCP_workflow_version",
+      "name": "SLCP_mrpe_workflow_version",
       "from": "submitter",
       "type": "jobspec_version",
       "version_regex": "job-sciflo-s1-slcp-mrpe",
-      "placeholder": "slcp job version"
+      "placeholder": "slcp mrpe job version"
+    },
+    {
+      "name": "SLCP_custom_workflow_version",
+      "from": "submitter",
+      "type": "jobspec_version",
+      "version_regex": "job-slcp-custom",
+      "placeholder": "slcp custom job version"
     },
     {
       "name": "LAR_workflow_version",
@@ -153,6 +171,7 @@
       "from": "submitter",
       "type": "jobspec_version",
       "version_regex": "job-cod2dpm",
+      "placeholder": "dpm job version"
       "placeholder": "dpm job version"
     },
     {

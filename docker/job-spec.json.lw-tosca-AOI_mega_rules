@@ -28,7 +28,11 @@
       "destination": "context"
     },
     {
-      "name": "SLCP_processing",
+      "name": "SLCP_mrpe_processing",
+      "destination": "context"
+    },
+    {
+      "name": "SLCP_custom_processing",
       "destination": "context"
     },
     {
@@ -56,7 +60,11 @@
       "destination": "context"
     },
     {
-      "name": "slcp_workflow",
+      "name": "slcp_mrpe_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_custom_workflow",
       "destination": "context"
     },
     {
