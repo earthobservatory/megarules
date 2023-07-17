@@ -294,7 +294,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params["name"] = name
         other_params["username"] = user_name
 
-    if workflow.endswith("slcp-mrpe") or workflow.endswith("slcp-custom") or workflow.endswith("ifg")
+    if workflow.endswith("slcp-mrpe") or workflow.endswith("slcp-custom") or workflow.endswith("ifg"):
         #add on-demand job for S1-SLCs already in the system
         submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
 
