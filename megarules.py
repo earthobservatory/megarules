@@ -445,7 +445,7 @@ def mega_rules(AOI_name, coordinates, acq_rule, slc_rule, slcp_mrpe_rule, slcp_c
         # slave_date_f = convert_datetime_for_slcp(slcp_custom_slave_date)
         # start_time_f = slave_date_f if slave_date_f < master_date_f else master_date_f
         # end_time_f = master_date_f if master_date_f > slave_date_f else slave_date_f
-        add_rule('event-slcp-custom', False, AOI_name, coordinates, slcp_custom_workflow, slcp_custom_workflow_version, projectName,
+        add_rule('event-', False, AOI_name, coordinates, slcp_custom_workflow, slcp_custom_workflow_version, projectName,
                  start_time_f, '', end_time_f, temporal_baseline, track_number, passthrough, minMatch,
                  ifg_azimuth_looks, filter_strength, dem_type, ifg_range_looks, coverage_threshold, dataset_tag,
                  slcp_custom_master_date, slcp_custom_slave_date, '', '',
@@ -515,7 +515,7 @@ if __name__ == "__main__":
 
     # parameters for slcp2lar
     lar_range_looks = ctx['lar_range_looks']
-    lar_azimuth_looks = ctx['ifg_azimuth_looks']
+    lar_azimuth_looks = ctx['lar_azimuth_looks']
 
     # parameters for slcp2cod
     cod_overriding_azimuth_looks = ctx['cod_overriding_azimuth_looks']
