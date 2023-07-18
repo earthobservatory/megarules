@@ -253,7 +253,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params = {"event_time":event_time, "start_time":start_time, "end_time":end_time, "dataset_tag":dataset_tag, "project":projectName, "singlesceneOnly": "true", "temporalBaseline":temporal_baseline, "minMatch":minMatch, "covth":coverage_threshold, "precise_orbit_only":"false", "azimuth_looks":azimuth_looks, "filter_strength":filter_strength, "dem_type":dem_type, "range_looks":range_looks}
     elif workflow.endswith("slcp-custom"):
         event_rule = rule_generation(open_ended, '"S1-IW_SLC"', track_number, start_time, end_time, coordinates,passthrough)
-        other_params = {"master_date": slcp_custom_master, "slave_date": slcp_custom_slave,  "dataset_tag": dataset_tag, "project": projectName, "singlesceneOnly": "true", "covth": coverage_threshold,"precise_orbit_only": "false", "azimuth_looks": azimuth_looks,"filter_strength": filter_strength, "dem_type": dem_type, "range_looks": range_looks, "coordinates": coordinates}
+        other_params = {"master_date": slcp_custom_master, "slave_date": slcp_custom_slave, 'track_number':track_number, "dataset_tag": dataset_tag, "project": projectName, "singlesceneOnly": "true", "covth": coverage_threshold,"precise_orbit_only": "false", "azimuth_looks": azimuth_looks,"filter_strength": filter_strength, "dem_type": dem_type, "range_looks": range_looks, "coordinates": coordinates}
     elif workflow.find("slcp2cod") != -1:
         event_rule = rule_generation(open_ended, '"S1-SLCP"', track_number, start_time, end_time, coordinates, passthrough)
         other_params = {"dataset_tag":dataset_tag, "project": projectName, "slcp_version":slcp_product_version, "aoi_name":AOI_name, "track_number": track_number, "overriding_azimuth_looks": cod_overriding_azimuth_looks, "overriding_range_looks": cod_overriding_range_looks, "minmatch": str(int(minmatch)), "min_overlap": str(min_overlap)}
@@ -286,7 +286,7 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
     logger.debug("{} rule added".format(mode))
     print("{} rule added".format(mode))
 
-    if workflow.endswith("slcp-mrpe") or workflow.endswith("ifg"):
+    if workflow.endswith("slcp-mrpe") or workflow.endswith("ifg") or workflow.endswith("slcp-custom"):
         # hardcoded components in slcp mrpe job with "from": "value" (see hysds.io.json.sciflo-s1-slcp-mrpe)
         other_params["auto_bbox"] = "true"
         other_params["preReferencePairDirection"] = "backward"
@@ -294,7 +294,6 @@ def add_rule(mode, open_ended, AOI_name, coordinates, workflow, workflow_version
         other_params["name"] = name
         other_params["username"] = user_name
 
-    if workflow.endswith("slcp-mrpe") or workflow.endswith("slcp-custom") or workflow.endswith("ifg"):
         #add on-demand job for S1-SLCs already in the system
         submit_jobs(rule_name, workflow, workflow_version, other_params, event_rule, dataset_tag)
 
