@@ -28,7 +28,11 @@
       "destination": "context"
     },
     {
-      "name": "SLCP_processing",
+      "name": "SLCP_mrpe_processing",
+      "destination": "context"
+    },
+    {
+      "name": "SLCP_custom_processing",
       "destination": "context"
     },
     {
@@ -56,7 +60,11 @@
       "destination": "context"
     },
     {
-      "name": "slcp_workflow",
+      "name": "slcp_mrpe_workflow",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_custom_workflow",
       "destination": "context"
     },
     {
@@ -84,7 +92,11 @@
       "destination": "context"
     },
     {
-      "name": "SLCP_workflow_version",
+      "name": "SLCP_mrpe_workflow_version",
+      "destination": "context"
+    },
+        {
+      "name": "SLCP_custom_workflow_version",
       "destination": "context"
     },
     {
@@ -141,6 +153,14 @@
     },
     {
       "name": "dataset_tag",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_custom_ref_date",
+      "destination": "context"
+    },
+    {
+      "name": "slcp_custom_sec_date",
       "destination": "context"
     },
     {
